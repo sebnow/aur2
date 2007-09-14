@@ -54,4 +54,10 @@
     <object pk="18" model="aur.category">
         <field type="CharField" name="name">xfce</field>
     </object>
+    <object pk="1" model="aur.architecture">
+        <field type="CharField" name="name">i686</field>
+    </object>
+    <object pk="2" model="aur.architecture">
+        <field type="CharField" name="name">x86_64</field>
+    </object>
 </django-objects>
