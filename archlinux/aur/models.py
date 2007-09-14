@@ -31,6 +31,9 @@ class Package(models.Model):
     category = models.ForeignKey(Category)
     architecture = models.ManyToManyField(Architecture)
     dep_packages = models.ManyToManyField('self', null=True, blank=True)
+    deleted = models.BooleanField()
+    added = models.DateTimeField(auto_now_add)
+    updated = models.DateTimeField(auto_now)
 
     def __unicode__(self):
         return self.name
@@ -39,7 +42,7 @@ class Package(models.Model):
         return self.architecture.all()
 
     class Admin:
-        list_display = ('name', 'category', 'get_arch')
+        list_display = ('name', 'category', 'get_arch', 'updated')
 
 
 class PackageFile(models.Model):
