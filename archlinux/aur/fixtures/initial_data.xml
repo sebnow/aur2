@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+    <object pk="1" model="aur.category">
+        <field type="CharField" name="name">daemons</field>
+    </object>
+    <object pk="2" model="aur.category">
+        <field type="CharField" name="name">devel</field>
+    </object>
+    <object pk="3" model="aur.category">
+        <field type="CharField" name="name">editors</field>
+    </object>
+    <object pk="4" model="aur.category">
+        <field type="CharField" name="name">emulators</field>
+    </object>
+    <object pk="5" model="aur.category">
+        <field type="CharField" name="name">games</field>
+    </object>
+    <object pk="6" model="aur.category">
+        <field type="CharField" name="name">gnome</field>
+    </object>
+    <object pk="7" model="aur.category">
+        <field type="CharField" name="name">i18n</field>
+    </object>
+    <object pk="8" model="aur.category">
+        <field type="CharField" name="name">kde</field>
+    </object>
+    <object pk="9" model="aur.category">
+        <field type="CharField" name="name">kernels</field>
+    </object>
+    <object pk="10" model="aur.category">
+        <field type="CharField" name="name">libs</field>
+    </object>
+    <object pk="11" model="aur.category">
+        <field type="CharField" name="name">modules</field>
+    </object>
+    <object pk="12" model="aur.category">
+        <field type="CharField" name="name">multimedia</field>
+    </object>
+    <object pk="13" model="aur.category">
+        <field type="CharField" name="name">network</field>
+    </object>
+    <object pk="14" model="aur.category">
+        <field type="CharField" name="name">office</field>
+    </object>
+    <object pk="15" model="aur.category">
+        <field type="CharField" name="name">science</field>
+    </object>
+    <object pk="16" model="aur.category">
+        <field type="CharField" name="name">system</field>
+    </object>
+    <object pk="17" model="aur.category">
+        <field type="CharField" name="name">x11</field>
+    </object>
+    <object pk="18" model="aur.category">
+        <field type="CharField" name="name">xfce</field>
+    </object>
+</django-objects>
