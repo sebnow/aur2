@@ -32,8 +32,8 @@ class Package(models.Model):
     architecture = models.ManyToManyField(Architecture)
     dep_packages = models.ManyToManyField('self', null=True, blank=True)
     deleted = models.BooleanField()
-    added = models.DateTimeField(auto_now_add)
-    updated = models.DateTimeField(auto_now)
+    added = models.DateTimeField()
+    updated = models.DateTimeField()
 
     def __unicode__(self):
         return self.name
