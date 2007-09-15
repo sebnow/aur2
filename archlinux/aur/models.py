@@ -26,7 +26,9 @@ class Architecture(models.Model):
 
 
 class Package(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, unique=True)
+    version = models.CharField(max_length=20)
+    release = models.SmallIntegerField()
     description = models.CharField(max_length=180)
     maintainers = models.ManyToManyField(User)
     category = models.ForeignKey(Category)
@@ -40,7 +42,8 @@ class Package(models.Model):
         return self.name
 
     def get_arch(self):
-        return self.architecture.all()
+        return ', '.join(map(str, self.architecture.all()))
+    get_arch.short_description = 'architectures'
 
     class Admin:
         list_display = ('name', 'category', 'get_arch', 'updated')
@@ -51,5 +54,32 @@ class Package(models.Model):
 
 class PackageFile(models.Model):
     package = models.ForeignKey(Package)
-    filename = models.CharField(100)
+    filename = models.CharField(max_length=100)
 
+class PackageHash(models.Model):
+    package = models.ForeignKey(Package)
+    type = models.IntegerField()
+    hash = models.CharField(max_length=64)
+
+    def __unicode__(self):
+        return self.hash
+
+    class Meta:
+        verbose_name_plural = 'packagehashes'
+
+
+class Comment(models.Model):
+    package = models.ForeignKey(Package)
+    parent = models.ForeignKey('self', null=True, blank=True)
+    user = models.ForeignKey(User)
+    message = models.TextField()
+    added = models.DateTimeField()
+    ip = models.IPAddressField()
+    hidden = models.BooleanField()
+    commit = models.BooleanField()
+
+    def __unicode__(self):
+        return self.message
+
+    class Admin:
+        pass
