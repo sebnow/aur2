@@ -44,6 +44,9 @@ class Package(models.Model):
     class Admin:
         list_display = ('name', 'category', 'get_arch', 'updated')
 
+    class Meta:
+        ordering = ('-updated',)
+        get_latest_by = 'updated'
 
 class PackageFile(models.Model):
     package = models.ForeignKey(Package)
