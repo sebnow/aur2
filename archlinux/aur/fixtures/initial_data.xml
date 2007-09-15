@@ -60,4 +60,10 @@
     <object pk="2" model="aur.architecture">
         <field type="CharField" name="name">x86_64</field>
     </object>
+    <object pk="1" model="aur.repository">
+        <field type="CharField" name="name">Unsupported</field>
+    </object>
+    <object pk="2" model="aur.repository">
+        <field type="CharField" name="name">Community</field>
+    </object>
 </django-objects>

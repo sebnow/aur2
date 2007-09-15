@@ -25,12 +25,26 @@ class Architecture(models.Model):
         pass
 
 
+class Repository(models.Model):
+    name = models.CharField(max_length=20)
+
+    def __unicode__(self):
+        return self.name
+
+    class Admin:
+        pass
+
+    class Meta:
+        verbose_name_plural = 'repositories'
+
+
 class Package(models.Model):
     name = models.CharField(max_length=30, unique=True)
     version = models.CharField(max_length=20)
     release = models.SmallIntegerField()
     description = models.CharField(max_length=180)
     maintainers = models.ManyToManyField(User)
+    repository = models.ForeignKey(Repository)
     category = models.ForeignKey(Category)
     architecture = models.ManyToManyField(Architecture)
     dep_packages = models.ManyToManyField('self', null=True, blank=True)
