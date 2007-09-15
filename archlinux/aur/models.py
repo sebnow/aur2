@@ -27,6 +27,7 @@ class Architecture(models.Model):
 
 class Package(models.Model):
     name = models.CharField(max_length=30)
+    description = models.CharField(max_length=180)
     maintainers = models.ManyToManyField(User)
     category = models.ForeignKey(Category)
     architecture = models.ManyToManyField(Architecture)
