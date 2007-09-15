@@ -16,7 +16,7 @@
             <td>{{ package.name }} {{ package.version }}-{{ package.release }}</td>
             <td>{{ package.description }}</td>
             <td>{{ package.category.name }}</td>
-            <td>{{ package.maintainers.get }}</td>
+            <td>{{ package.maintainers.all|join:", " }}</td>
             <td>{{ package.updated }}</td>
         </tr>
         {% endfor %}
