@@ -3,18 +3,20 @@
 <div class="greybox">
     <table class="results" width="100%">
         <tr>
+            <th>Location</th>
             <th>Name</th>
-            <th>Version</th>
-            <th>Category</th>
             <th>Description</th>
+            <th>Category</th>
+            <th>Maintainer</th>
             <th>Last Updated</th>
         </tr>
         {% for package in latest %}
         <tr>
-            <td>{{ package.name }}</td>
-            <td>{{ package.version }}</td>
-            <td>{{ package.category.name }}</td>
+            <td>{{ package.repository }}</td>
+            <td>{{ package.name }} {{ package.version }}-{{ package.release }}</td>
             <td>{{ package.description }}</td>
+            <td>{{ package.category.name }}</td>
+            <td>{{ package.maintainers.get }}</td>
             <td>{{ package.updated }}</td>
         </tr>
         {% endfor %}
