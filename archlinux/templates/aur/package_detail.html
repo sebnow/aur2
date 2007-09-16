@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="box">
+    <h2 class="title">{{ pkg.name }} {{ pkg.version }}-{{ pkg.release }}</h2>
+    <div style="float:right" class="listing">
+        <ul class="small">
+            <li><a href="#">View $SCM Entries</a></li>
+            <li><a href="/package/{{ pkg.name }}/files/">View File List</a></li>
+        </ul>
+    </div>
+    <table class="listing">
+        <tr>
+            <th>Repository:</th>
+            <td>{{ pkg.repository.name }}</td>
+        </tr><tr>
+            <th>Category:</th>
+            <td>{{ pkg.category.name }}</td>
+        </tr><tr>
+            <th>Description:</th>
+            <td>{{ pkg.description }}</td>
+        </tr><tr>
+            <th>Architecture:</th>
+            <td>{{ pkg.get_arch }}</th>
+        </tr><tr>
+            <th>URL:</th>
+            <td><a href="{{ pkg.get_absolute_url }}">{{ pkg.get_absolute_url }}</a></td>
+        </tr><tr>
+            <th>Maintainer:</th>
+            <td>{{ package.maintainers.all|join:", " }}</td>
+        </tr><tr>
+            <th>Last Updated:</th>
+            <td>{{ pkg.updated|date:"Y-m-d H:i:s" }}</td>
+        </tr>
+    </table>
+    <br />
+    <table width="100%">
+        <tr>
+            <td valign="top">
+                <div class="listing">
+                    <h4>Dependencies:</h4>
+                    <ul style="font-size:small;list-style:none">
+                        {{ "<li>"|join:pkg.dep_packages.all|join:"</li>\n" }}
+                    </ul>
+                </div>
+            </td><td colspan="2" valign="top">
+                <div class="listing">
+                    <h4>Sources:</h4>
+                    <ul style="font-size:small;list-style:none">
+                        <li>TODO</li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+{% endblock %}
+
