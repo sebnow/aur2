@@ -11,7 +11,7 @@
             <th>Last Updated</th>
         </tr>
         {% for package in latest %}
-        <tr>
+        <tr class="{% cycle 'pkgr1' 'pkgr2' %}">
             <td>{{ package.repository }}</td>
             <td>{{ package.name }} {{ package.version }}-{{ package.release }}</td>
             <td>{{ package.description }}</td>
