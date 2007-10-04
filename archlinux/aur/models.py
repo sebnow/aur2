@@ -39,7 +39,7 @@ class Repository(models.Model):
 
 
 class Package(models.Model):
-    name = models.CharField(max_length=30, unique=True)
+    name = models.CharField(primary_key=True, max_length=30)
     version = models.CharField(max_length=20)
     release = models.SmallIntegerField()
     description = models.CharField(max_length=180)
