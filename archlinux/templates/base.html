@@ -1,3 +1,4 @@
+{% load i18n %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1-strict.dtd ">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
@@ -17,30 +18,30 @@
             </div>
             <div style="float: right; color: #eeeeee; font-size: small">
             {% if not user.is_anonymous %}
-                Logged in as <strong>{{ user.username }}</strong>.
+            {% trans "Logged in as" %} <strong>{{ user.username }}</strong>.
                 <a href="/accounts/logout/">Logout</a>
             {% endif %}
             </div>
             <div id="main_nav">
                 {% block topmenu %}
                 <ul>
-                    <li><a href="http://www.archlinux.org/download/">Get Arch</a></li>
+                    <li><a href="http://www.archlinux.org/download/">{% trans "Get Arch" %}</a></li>
                     <li><a class="selected" href="http://aur.archlinux.org">AUR</a></li>
-                    <li><a href="http://bugs.archlinux.org">Bugs</a></li>
-                    <li><a href="http://wiki.archlinux.org">Wiki</a></li>
-                    <li><a href="http://bbs.archlinux.org">Forums</a></li>
-                    <li><a href="http://www.archlinux.org/">Home</a></li>
+                    <li><a href="http://bugs.archlinux.org">{% trans "Bugs" %}</a></li>
+                    <li><a href="http://wiki.archlinux.org">{% trans "Wiki" %}</a></li>
+                    <li><a href="http://bbs.archlinux.org">{% trans "Forums" %}</a></li>
+                    <li><a href="http://www.archlinux.org/">{% trans "Home" %}</a></li>
                 </ul>
                 {% endblock %}
             </div>
             {% block submenu %}
             <div id="dev_nav">
                 <ul>
-                    <li><a href="/statistics/">Statistics</a></li>
-                    <li><a href="http://www.archlinux.org/mailman/listinfo/tur-users">Mailing List</a></li>
-                    <li><a href="http://bugs.archlinux.org/index.php?tasks=all&project=2">Bugs</a></li>
-                    <li><a href="/account/">Account</a></li>
-                    <li><a href="/packages/">Packages</a></li>
+                    <li><a href="/statistics/">{% trans "Statistics" %}</a></li>
+                    <li><a href="http://www.archlinux.org/mailman/listinfo/tur-users">{% trans "Mailing List" %}</a></li>
+                    <li><a href="http://bugs.archlinux.org/index.php?tasks=all&project=2">{% trans "Bugs" %}</a></li>
+                    <li><a href="/account/">{% trans "Account" %}</a></li>
+                    <li><a href="/packages/">{% trans "Packages" %}</a></li>
                 </ul>
             </div>
             {% endblock %}
