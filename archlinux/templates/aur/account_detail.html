@@ -4,49 +4,49 @@
     <form action="./" method="post">
         <table>
             <tr>
-                <td><label for="username">Username:</label></td>
+                <td><label for="username">{% trans "Username" %}:</label></td>
                 <td><input type="text" name="username" id="username" /></td>
             </tr>
             <tr>
-                <td><label for="email">Email:</label></td>
+                <td><label for="email">{% trans "Email" %}:</label></td>
                 <td><input type="text" name="email" id="email" /></td>
             </tr>
             <tr>
-                <td><label for="password">Password:</label></td>
+                <td><label for="password">{% trans "Password" %}:</label></td>
                 <td><input type="password" name="password" id="password" /></td>
             </tr>
             <tr>
-                <td><label for="password-verify">Re-type Password:</label></td>
+                <td><label for="password-verify">{% trans "Re-type Password" %}:</label></td>
                 <td><input type="password-verify" name="password-verify" id="password-verify" /></td>
             </tr>
             <tr>
-                <td><label for="realname">Real Name:</label></td>
+                <td><label for="realname">{% trans "Real Name" %}:</label></td>
                 <td><input type="text" name="realname" id="realname" /></td>
             </tr>
             <tr>
-                <td><label for="ircnick">IRC Nick:</label></td>
+                <td><label for="ircnick">{% trans "IRC Nick" %}:</label></td>
                 <td><input type="text" name="ircnick" id="ircnick" /></td>
             </tr>
             <tr>
-                <td><label for="language">Preferred Language:</label></td>
+                <td><label for="language">{% trans "Preferred Language" %}:</label></td>
                 <td>
                     <select name="language" id="language">
-                        <option value="english">English</option>
-                        <option value="polish">Polski</option>
+                        <option value="english">{% trans "English" %}</option>
+                        <option value="polish">{% trans "Polski" %}</option>
                     </select>
                 </td>
             </tr>
             <tr>
-                <td><label for="comment-notify">Notify on new comment:</label></td>
+                <td><label for="comment-notify">{% trans "Notify on new comment" %}:</label></td>
                 <td><input type="checkbox" name="comment-notify" id="comment-notify" /></td>
             </tr>
             <tr>
-                <td><label for="ood-notify">Notify of Out-of-Date packages:</label></td>
+                <td><label for="ood-notify">{% trans "Notify of Out-of-Date packages" %}:</label></td>
                 <td><input type="checkbox" name="ood-notify" id="ood-notify" /></td>
             </tr>
         </table>
         <div style="text-align:center">
-            <input type="submit" value="Update" /> <input type="reset" />
+            <input type="submit" value="{% trans "Update" %}" /> <input type="reset" value="{% trans "Reset" %}"/>
         </div>
     </form>
 </div>
