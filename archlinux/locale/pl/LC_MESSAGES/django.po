@@ -1,0 +1,141 @@
+# Polish translation
+# Copyright (C) 2007 Sebastian Nowicki
+# This file is distributed under the same license as the AUR package.
+# Sebastian Nowicki <xilonmu@gmail>, 2007
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-10-04 18:08+0800\n"
+"PO-Revision-Date: 2007-10-04 18:08+0800\n"
+"Last-Translator: Sebastian Nowicki <xilonmu@gmail.com>\n"
+"Language-Team: Polish <pl@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: templates/base.html:21
+msgid "Logged in as"
+msgstr "Zalogowany jako"
+
+#: templates/base.html:28
+msgid "Get Arch"
+msgstr "Ściągnij Arch"
+
+#: templates/base.html:30 templates/base.html.py:42
+msgid "Bugs"
+msgstr "Błędy"
+
+#: templates/base.html:31
+msgid "Wiki"
+msgstr "Wiki"
+
+#: templates/base.html:32
+msgid "Forums"
+msgstr "Dyskusja"
+
+#: templates/base.html:33
+msgid "Home"
+msgstr "Dom"
+
+#: templates/base.html:40
+msgid "Statistics"
+msgstr "Statystyki"
+
+#: templates/base.html:41
+msgid "Mailing List"
+msgstr "Lista Poctowa"
+
+#: templates/base.html:43
+msgid "Account"
+msgstr "Konto"
+
+#: templates/base.html:44
+msgid "Packages"
+msgstr "Pakiety"
+
+#: templates/aur/package_archive.html:6 templates/aur/package_detail.html:13
+msgid "Repository"
+msgstr "Repozytorium"
+
+#: templates/aur/package_archive.html:7
+msgid "Name"
+msgstr "Imię"
+
+#: templates/aur/package_archive.html:8 templates/aur/package_detail.html:19
+msgid "Description"
+msgstr "Opis"
+
+#: templates/aur/package_archive.html:9 templates/aur/package_detail.html:16
+msgid "Category"
+msgstr "Kategoria"
+
+#: templates/aur/package_archive.html:10 templates/aur/package_detail.html:28
+msgid "Maintainer"
+msgstr "Opiekun"
+
+#: templates/aur/package_archive.html:11 templates/aur/package_detail.html:31
+msgid "Last Updated"
+msgstr "Ostatnio Aktualizowano"
+
+#: templates/aur/account_detail.html:7
+msgid "Username"
+msgstr "Użytkownik"
+
+#: templates/aur/account_detail.html:11
+msgid "Email"
+msgstr "Adres e-mail"
+
+#: templates/aur/account_detail.html:15
+msgid "Password"
+msgstr "Hasło"
+
+#: templates/aur/account_detail.html:19
+msgid "Re-type Password"
+msgstr "Hasło (ponownie)"
+
+#: templates/aur/account_detail.html:23
+msgid "Real Name"
+msgstr "Imię i nazwisko"
+
+#: templates/aur/account_detail.html:27
+msgid "IRC Nick"
+msgstr "Ksywa na IRC"
+
+#: templates/aur/account_detail.html:31
+msgid "Preferred Language"
+msgstr "Język"
+
+#: templates/aur/account_detail.html:40
+msgid "Notify on new comment"
+msgstr "Zawiadamiaj o nowych komentarzach"
+
+#: templates/aur/account_detail.html:44
+msgid "Notify of Out-of-Date packages"
+msgstr "Zawiadamiaj o przestarzałych pakietach"
+
+#: templates/aur/account_detail.html:49
+msgid "Update"
+msgstr "Aktualizuj"
+
+#: templates/aur/account_detail.html:49
+msgid "Reset"
+msgstr "Wyczyść"
+
+#: templates/aur/package_detail.html:22
+msgid "Architecture"
+msgstr "Architektuta"
+
+#: templates/aur/package_detail.html:25
+msgid "URL"
+msgstr "Adres URL"
+
+#: templates/aur/package_detail.html:40
+msgid "Dependencies"
+msgstr "Zależności"
+
+#: templates/aur/package_detail.html:47
+msgid "Sources"
+msgstr "Źródła"
