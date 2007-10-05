@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.admin.models import User
+from django import newforms as forms # This will change to forms in 0.98 or 1.0
 
 class Category(models.Model):
     name = models.CharField(max_length=20)
@@ -97,3 +98,33 @@ class Comment(models.Model):
 
     class Admin:
         pass
+
+
+class PackageSearchForm(forms.Form):
+    query = forms.CharField(max_length=30)
+    repository = forms.CharField(max_length=20)
+    category = forms.CharField(max_length=20)
+    lastupdate = forms.DateTimeField()
+    limit = forms.ChoiceField(choices=(
+        (25, 25),
+        (50, 50),
+        (75, 75),
+        (100, 100),
+        (150, 150),
+    ))
+    sortby = forms.ChoiceField(choices=(
+        ('name', 'Package Name'),
+        ('category', 'Category'),
+        ('location', 'Location'),
+        ('votes', 'Votes'),
+        ('maintainer', 'Maintainer'),
+        ('age', 'Age'),
+    ))
+    order = ChoiceField(choices=(
+        ('asc', 'Ascending'),
+        ('desc', 'Descending'),
+    ))
+    searchby = forms.ChoiceField(choices=(
+        ('name': 'Package Name'),
+        ('maintainer': 'Maintainer'),
+    ))
