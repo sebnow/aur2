@@ -1,13 +1,23 @@
 from django.conf.urls.defaults import *
 from archlinux.aur.models import Package
 
-info_dict = {
+index_dict = {
     'queryset': Package.objects.all(),
     'date_field': 'updated',
 }
 
-urlpatterns = patterns('django.views.generic',
-    (r'^package/(?P<object_id>[a-zA-Z0-9_]+)/$', 'list_detail.object_detail',
-        dict(queryset=Package.objects.all(), template_object_name='pkg')),
-    (r'^$', 'date_based.archive_index', info_dict),
+detail_dict = {
+    'queryset': Package.objects.all(),
+    'template_object_name': 'pkg',
+}
+
+urlpatterns = patterns('',
+    (r'^search/$', 'archlinux.aur.views.search'),
+)
+
+# Generic views
+# These will probably be removed at a later stage
+urlpatterns += patterns('django.views.generic',
+    (r'^package/(?P<object_id>\w+)/$', 'list_detail.object_detail', dict(detail_dict)),
+    (r'^$', 'date_based.archive_index', dict(index_dict)),
 )
