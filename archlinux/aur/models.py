@@ -101,10 +101,20 @@ class Comment(models.Model):
 
 
 class PackageSearchForm(forms.Form):
+    # Borrowed from AUR2-BR
+    def __init__(self, *args, **kwargs):
+        super(PackageSearchForm, self).__init__(*args, **kwargs)
+        category_choices = [('all', 'All')]
+        category_choices += [(category.name.lower(), category.name) for category in Category.objects.all()]
+        repository_choices = [('all', 'All')]
+        repository_choices += [(repository.name.lower(), repository.name) for repository in Repository.objects.all()]
+        self.fields['category'].choices = category_choices
+        self.fields['repository'].choices = repository_choices
+
     query = forms.CharField(max_length=30)
-    repository = forms.CharField(max_length=20)
-    category = forms.CharField(max_length=20)
-    lastupdate = forms.DateTimeField()
+    repository = forms.ChoiceField(choices=())
+    category = forms.ChoiceField(choices=())
+    lastupdate = forms.DateTimeField(label="Last Update", required=False)
     limit = forms.ChoiceField(choices=(
         (25, 25),
         (50, 50),
@@ -112,7 +122,7 @@ class PackageSearchForm(forms.Form):
         (100, 100),
         (150, 150),
     ))
-    sortby = forms.ChoiceField(choices=(
+    sortby = forms.ChoiceField(label="Sort By", choices=(
         ('name', 'Package Name'),
         ('category', 'Category'),
         ('location', 'Location'),
@@ -120,11 +130,11 @@ class PackageSearchForm(forms.Form):
         ('maintainer', 'Maintainer'),
         ('age', 'Age'),
     ))
-    order = ChoiceField(choices=(
+    order = forms.ChoiceField(choices=(
         ('asc', 'Ascending'),
         ('desc', 'Descending'),
     ))
-    searchby = forms.ChoiceField(choices=(
-        ('name': 'Package Name'),
-        ('maintainer': 'Maintainer'),
+    searchby = forms.ChoiceField(label="Search By",choices=(
+        ('name', 'Package Name'),
+        ('maintainer', 'Maintainer'),
     ))
