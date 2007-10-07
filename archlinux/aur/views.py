@@ -1,4 +1,7 @@
+from re import sub
+
 from django.shortcuts import render_to_response
+from BetterPaginator import BetterPaginator
 from django import newforms as forms # This will change to forms in 0.68 or 1.0
 
 from archlinux.aur.models import Package, PackageSearchForm
@@ -52,4 +55,18 @@ def search(request, query = ''):
     else:
         results = results.order_by(sortby, 'repository', 'category', 'name')
 
-    return render_to_response('aur/search.html', {'form': form, 'packages': results})
+    # Take care of pagination
+    # Replace the current page with the new one if it's already in GET
+    if request.GET.has_key('page'):
+        link_template = sub(r'page=\d+', 'page=%d', request.get_full_path())
+    else:
+        link_template = 'page=%s'
+    # Initialise the pagination
+    paginator = BetterPaginator(results, int(form.cleaned_data["limit"]), link_template)
+    paginator.set_page(int(request.GET.get('page', '1')))
+
+    return render_to_response('aur/search.html', {
+        'form': form,
+        'packages': paginator.get_page(),
+        'pager': paginator,
+    })
