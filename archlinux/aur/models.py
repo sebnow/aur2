@@ -113,7 +113,7 @@ class PackageSearchForm(forms.Form):
 
     repository = forms.ChoiceField(choices=())
     category = forms.ChoiceField(choices=())
-    query = forms.CharField(max_length=30, label="Keywords")
+    query = forms.CharField(max_length=30, label="Keywords", required=False)
     searchby = forms.ChoiceField(label="Search By",choices=(
         ('name', 'Package Name'),
         ('maintainer', 'Maintainer'),
@@ -122,10 +122,8 @@ class PackageSearchForm(forms.Form):
     sortby = forms.ChoiceField(label="Sort By", choices=(
         ('name', 'Package Name'),
         ('category', 'Category'),
-        ('location', 'Location'),
-        ('votes', 'Votes'),
-        ('maintainer', 'Maintainer'),
-        ('age', 'Age'),
+        ('repository', 'Repository'),
+        ('updated', 'Last Updated'),
     ))
     order = forms.ChoiceField(choices=(
         ('asc', 'Ascending'),
