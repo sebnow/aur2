@@ -43,7 +43,7 @@
             <th>{% trans "Maintainer" %}</th>
             <th>{% trans "Last Updated" %}</th>
         </tr>
-        {% for package in latest %}
+        {% for package in packages %}
         <tr class="{% cycle 'pkgr1' 'pkgr2' %}">
             <td>{{ package.repository }}</td>
             <td><a href="/package/{{package.name}}/">{{ package.name }} {{ package.version }}-{{ package.release }}</a></td>
