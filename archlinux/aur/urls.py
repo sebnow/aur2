@@ -12,6 +12,7 @@ detail_dict = {
 }
 
 urlpatterns = patterns('',
+    (r'^$', 'archlinux.aur.views.search'),
     (r'^search/$', 'archlinux.aur.views.search'),
 )
 
@@ -19,5 +20,4 @@ urlpatterns = patterns('',
 # These will probably be removed at a later stage
 urlpatterns += patterns('django.views.generic',
     (r'^package/(?P<object_id>\w+)/$', 'list_detail.object_detail', dict(detail_dict)),
-    (r'^$', 'date_based.archive_index', dict(index_dict)),
 )
