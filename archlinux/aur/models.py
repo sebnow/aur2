@@ -111,17 +111,14 @@ class PackageSearchForm(forms.Form):
         self.fields['category'].choices = category_choices
         self.fields['repository'].choices = repository_choices
 
-    query = forms.CharField(max_length=30)
     repository = forms.ChoiceField(choices=())
     category = forms.ChoiceField(choices=())
-    lastupdate = forms.DateTimeField(label="Last Update", required=False)
-    limit = forms.ChoiceField(choices=(
-        (25, 25),
-        (50, 50),
-        (75, 75),
-        (100, 100),
-        (150, 150),
+    query = forms.CharField(max_length=30, label="Keywords")
+    searchby = forms.ChoiceField(label="Search By",choices=(
+        ('name', 'Package Name'),
+        ('maintainer', 'Maintainer'),
     ))
+    lastupdate = forms.DateTimeField(label="Last Update", required=False)
     sortby = forms.ChoiceField(label="Sort By", choices=(
         ('name', 'Package Name'),
         ('category', 'Category'),
@@ -134,7 +131,10 @@ class PackageSearchForm(forms.Form):
         ('asc', 'Ascending'),
         ('desc', 'Descending'),
     ))
-    searchby = forms.ChoiceField(label="Search By",choices=(
-        ('name', 'Package Name'),
-        ('maintainer', 'Maintainer'),
+    limit = forms.ChoiceField(choices=(
+        (25, 25),
+        (50, 50),
+        (75, 75),
+        (100, 100),
+        (150, 150),
     ))
