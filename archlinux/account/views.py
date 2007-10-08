@@ -1,9 +1,11 @@
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 
 from archlinux.account.models import RegistrationForm
+from archlinux.aur.models import Package
 
 def register(request):
     # Are we submitting or just displaying?
@@ -27,5 +29,13 @@ def register(request):
     form = RegistrationForm()
     return render_to_response('registration/register.html', {'form': form, 'user': request.user})
 
+@login_required
 def profile(request):
-    return HttpResponseRedirect('/')
+    packages = Package.objects.filter(maintainers__username__exact=request.user.username)
+    form = RegistrationForm()
+
+    return render_to_response('registration/profile.html', {
+        'packages': packages,
+        'user': request.user,
+        'form': form,
+    })
