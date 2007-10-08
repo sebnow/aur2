@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+<div class="box">
+    <h2>{% trans "Logged out" %}</h2>
+    <p>Thanks for spending some quality time with the web site today.</p>
+    <p><a href="{% url user_login %}">{% trans "Log in again" %}</a></p>
+</div>
+{% endblock %}
