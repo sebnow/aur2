@@ -47,6 +47,19 @@
             {% endblock %}
         </div>
         <div id="content">
+            {% block search %}
+            <div id="search">
+                <form action="/search/" method="get">
+                    <input type="hidden" name="repository" value="all" />
+                    <input type="hidden" name="category" value="all" />
+                    <input type="hidden" name="searchby" value="name" />
+                    <input type="hidden" name="sortby" value="name" />
+                    <input type="hidden" name="order" value="asc" />
+                    <input type="hidden" name="limit" value="25" />
+                    <p>Package Search: <input type="test" maxlength="200" size="20" name="query" /></p>
+                </form>
+            </div>
+            {% endblock %}
             {% block content %}
             {% endblock %}
         </div>
