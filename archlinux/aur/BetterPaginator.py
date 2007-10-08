@@ -67,3 +67,5 @@ class BetterPaginator(ObjectPaginator):
                              self.make_page_links(self.current_page-window_size/2-1, self.current_page+window_size/2-1),
                              self.make_page_links(self.pages-2, self.pages)]
         return links
+    def has_pagination(self):
+        return self.pages > 1
