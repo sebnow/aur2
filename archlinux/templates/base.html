@@ -40,9 +40,9 @@
                 <ul>
                     <li><a href="/statistics/">{% trans "Statistics" %}</a></li>
                     <li><a href="http://www.archlinux.org/mailman/listinfo/tur-users">{% trans "Mailing List" %}</a></li>
-                    <li><a href="http://bugs.archlinux.org/index.php?tasks=all&project=2">{% trans "Bugs" %}</a></li>
-                    <li><a href="/account/">{% trans "Account" %}</a></li>
-                    <li><a href="/">{% trans "Packages" %}</a></li>
+                    <li><a href="http://bugs.archlinux.org/index.php?tasks=all&project=2">{% trans "Bugs" %}</a></li>{% if user.is_authenticated %}
+                    <li><a href="{% url archlinux.account.views.profile %}">{% trans "Account" %}</a></li>
+                    {% endif %}<li><a href="/">{% trans "Packages" %}</a></li>
                 </ul>
             </div>
             {% endblock %}
@@ -65,7 +65,7 @@
             {% endblock %}
         </div>
         <div class="foot">
-            Copyright © 2002-2007, Judd Vinet &lt;<a href="mailto:jvinet@zeroflux.org">jvinet@zeroflux.org</a>&gt;<br /><br />
+            Copyright &copy; 2002-2007, Judd Vinet &lt;<a href="mailto:jvinet@zeroflux.org">jvinet@zeroflux.org</a>&gt;<br /><br />
             <img src="http://www.archlinux.org/logos/button.png" alt="Arch Linux" />
         </div>
     </body>
