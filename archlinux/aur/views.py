@@ -60,7 +60,7 @@ def search(request, query = ''):
     if request.GET.has_key('page'):
         link_template = sub(r'page=\d+', 'page=%d', request.get_full_path())
     else:
-        link_template = 'page=%s'
+        link_template = request.get_full_path() + '&page=%d'
     # Initialise the pagination
     paginator = BetterPaginator(results, int(form.cleaned_data["limit"]), link_template)
     paginator.set_page(int(request.GET.get('page', '1')))
