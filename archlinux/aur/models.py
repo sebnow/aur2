@@ -51,6 +51,7 @@ class Package(models.Model):
     architecture = models.ManyToManyField(Architecture)
     dep_packages = models.ManyToManyField('self', null=True, blank=True)
     deleted = models.BooleanField(default=False)
+    outdated = models.BooleanField(default=False)
     added = models.DateTimeField()
     updated = models.DateTimeField()
 
