@@ -18,8 +18,9 @@
             </div>
             <div style="float: right; color: #eeeeee; font-size: small">
             {% if not user.is_anonymous %}
-            {% trans "Logged in as" %} <strong>{{ user.username }}</strong>.
-                <a href="/accounts/logout/">Logout</a>
+            {% trans "Logged in as" %} <strong>{{ user.username }}</strong>. <a href="{% url user_logout %}">Logout</a>
+            {% else %}
+            <a href="{% url user_login %}">{% trans "Login" %}</a>
             {% endif %}
             </div>
             <div id="main_nav">
