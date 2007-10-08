@@ -1,0 +1,11 @@
+{% extends "base-sidebar.html" %}
+{% load i18n %}
+{% block content %}
+<div class="greybox">
+    <h3>Account Details</h3>
+    <table>
+        {{ form }}
+    </table>
+    <p style="text-align: center"><input type="submit" value="Update" /></p>
+</div>
+{% endblock %}
