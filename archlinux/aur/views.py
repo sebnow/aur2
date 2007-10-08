@@ -73,4 +73,5 @@ def search(request, query = ''):
         'form': form,
         'packages': paginator.get_page(),
         'pager': paginator,
+        'user': request.user,
     })
