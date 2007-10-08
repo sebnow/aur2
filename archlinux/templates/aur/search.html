@@ -59,12 +59,12 @@
     {% if pager.has_previous_page %}<span style="float: left"><a href="{{ pager.previous_link }}">&lt;&lt;&lt; Previous</a></span>{% endif %}
     {% if pager.has_next_page %}<span style="float: right"><a href="{{ pager.next_link }}">Next &gt;&gt;&gt;</a></span>{% endif %}
     <div style="text-align: center; width:75%; margin: auto;">
-    {% for set in pager.windowed_page_links %}
+    {% if pager.has_pagination %}{% for set in pager.windowed_page_links %}
         {% if not forloop.first %}...{% endif %}
         {% for page in set %}
             {% if page.2 %}{{ page.0 }}{% else %}<a href="{{ page.1 }}">{{ page.0 }}</a>{% endif %}
         {% endfor %}
-    {% endfor %}
+    {% endfor %}{%endif %}
     </div>
 </div>
 {% endblock %}
