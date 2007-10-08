@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+<div class="greybox">
+    <h2 class="title">{% trans "Registration form" %}</h2>
+    <form method="post" action=".">
+        <table>{% for field in form %}
+            <tr>
+                <td>{{ field.label_tag }}:</td>
+                <td>{{ field }}</td>
+                <td>{% if field.errors %}{{ field.errors }}{% else %}&nbsp;{% endif %}</td>
+            </tr>
+            {% endfor %}<tr>
+                <td colspan="3" style="text-align:center"><input type="submit" value="{% trans "Register" %}" /> <input type="reset" value="{% trans "Reset" %}" /></td>
+            </tr>
+        </table>
+    </form>
+</div>
+{% endblock %}

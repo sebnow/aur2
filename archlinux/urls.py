@@ -6,7 +6,6 @@ urlpatterns = patterns('',
 
     # Uncomment this for admin:
     (r'^admin/', include('django.contrib.admin.urls')),
-    url(r'^accounts/logout/', 'django.contrib.auth.views.logout', name='user_logout'),
-    url(r'^accounts/login/', 'django.contrib.auth.views.login', name='user_login'),
+    (r'^accounts/', include('archlinux.account.urls')),
     (r'^', include('archlinux.aur.urls')),
 )
