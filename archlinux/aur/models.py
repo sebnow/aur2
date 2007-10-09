@@ -138,3 +138,13 @@ class PackageSearchForm(forms.Form):
         (100, 100),
         (150, 150),
     ))
+
+class PackageSubmitForm(forms.Form):
+    # Borrowed from AUR2-BR
+    def __init__(self, *args, **kwargs):
+        super(PackageSubmitForm, self).__init__(*args, **kwargs)
+        category_choices = [(category.name.lower(), category.name) for category in Category.objects.all()]
+        self.fields['category'].choices = category_choices
+
+    category = forms.ChoiceField(choices=())
+    comment = forms.CharField(widget=forms.Textarea, label="Commit Message")

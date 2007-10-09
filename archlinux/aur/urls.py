@@ -14,6 +14,7 @@ detail_dict = {
 urlpatterns = patterns('',
     (r'^$', 'archlinux.aur.views.search'),
     (r'^search/$', 'archlinux.aur.views.search'),
+    (r'^submit/$', 'archlinux.aur.views.submit'),
 )
 
 # Generic views
