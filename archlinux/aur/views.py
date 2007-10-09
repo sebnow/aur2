@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response
 from BetterPaginator import BetterPaginator
 from django import newforms as forms # This will change to forms in 0.68 or 1.0
 
-from archlinux.aur.models import Package, PackageSearchForm
+from archlinux.aur.models import Package, PackageSearchForm, PackageSubmitForm
 
 def search(request, query = ''):
     if request.method == 'GET' and request.GET.has_key('query'):
@@ -73,4 +73,12 @@ def search(request, query = ''):
         'packages': paginator.get_page(),
         'pager': paginator,
         'user': request.user,
+    })
+
+def submit(request):
+    form = PackageSubmitForm()
+
+    return render_to_response('aur/submit.html', {
+        'user': request.user,
+        'form': form,
     })
