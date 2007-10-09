@@ -39,9 +39,11 @@
             <td valign="top">
                 <div class="listing">
                     <h4>{% trans "Dependencies" %}:</h4>
-                    <ul style="font-size:small;list-style:none">{% for dep in pkg.dep_packages.all %}
+                    <ul style="font-size:small;list-style:none">{% ifnotequal pkg.dep_packages.all.count 0 %}{% for dep in pkg.dep_packages.all %}
                         <li><a href="{% url django.views.generic.list_detail.object_detail object_id=dep.name %}">{{ dep.name }}</a></li>{% endfor %}
-                    </ul>
+                    {% else %}
+                        <li>None</li>
+                    {% endifnotequal %}</ul>
                 </div>
             </td><td colspan="2" valign="top">
                 <div class="listing">
