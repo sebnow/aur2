@@ -147,4 +147,5 @@ class PackageSubmitForm(forms.Form):
         self.fields['category'].choices = category_choices
 
     category = forms.ChoiceField(choices=())
+    file = forms.FileField(label="PKGBUILD")
     comment = forms.CharField(widget=forms.Textarea, label="Commit Message")

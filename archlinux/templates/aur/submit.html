@@ -2,7 +2,7 @@
 {% load i18n %}
 {% block content %}
 <div class="greybox">
-    <form action="." method="post">
+    <form action="." method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
         <table>{% for field in form %}
             <tr>
                 <th style="vertical-align: top; text-align: right;">{{ field.label_tag }}: </th>
