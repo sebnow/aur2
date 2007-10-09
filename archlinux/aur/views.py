@@ -16,12 +16,11 @@ def search(request, query = ''):
         # Find the packages by searching description and package name or maintainer
         if form.cleaned_data["query"] != '':
             if form.cleaned_data["searchby"] == 'maintainer':
-                res1 = Package.objects.filter(maintainers__username__icontains=form.cleaned_data["query"])
-                res2 = None
+                results = Package.objects.filter(maintainers__username__icontains=form.cleaned_data["query"])
             else:
                 res1 = Package.objects.filter(name__icontains=form.cleaned_data["query"])
                 res2 = Package.objects.filter(description__icontains=form.cleaned_data["query"])
-            results = res1 | res2
+                results = res1 | res2
         else:
             results = Package.objects.all()
 
