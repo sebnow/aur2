@@ -3,6 +3,7 @@
 {% block content_left %}
 <div class="greybox">
     <h3>{% trans "My Packages" %}</h3>
+    {% ifnotequal packages.count 0 %}
     <table class="results" width="100%">
         <tr>
             <th>{% trans "Repository" %}</th>
@@ -21,6 +22,11 @@
         </tr>
         {% endfor %}
     </table>
+    {% else %}
+    <p>You have not submitted any packages yet. How about making a
+    <a href="http://wiki.archlinux.org/index.php/Arch_Packaging_Standards">PKGBUILD</a>
+    for one of <a href="http://bbs.archlinux.org/viewforum.php?id=38">these requests</a>?</p>
+    {% endifnotequal %}
 </div>
 {% endblock %}
 {% block content_right %}
