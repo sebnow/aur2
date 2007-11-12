@@ -40,7 +40,7 @@
                 <ul>
                     <li><a href="/statistics/">{% trans "Statistics" %}</a></li>
                     <li><a href="http://www.archlinux.org/mailman/listinfo/tur-users">{% trans "Mailing List" %}</a></li>
-                    <li><a href="http://bugs.archlinux.org/index.php?tasks=all&project=2">{% trans "Bugs" %}</a></li>{% if user.is_authenticated %}
+                    <li><a href="http://bugs.archlinux.org/index.php?tasks=all&amp;project=2">{% trans "Bugs" %}</a></li>{% if user.is_authenticated %}
                     <li><a href="{% url archlinux.aur.views.submit %}">{% trans "Submit" %}</a></li>
                     <li><a href="{% url archlinux.account.views.profile %}">{% trans "Account" %}</a></li>
                     {% endif %}<li><a href="/">{% trans "Packages" %}</a></li>
@@ -52,20 +52,20 @@
             {% block search %}
             <div id="search" style="position: static; float: none; text-align: right;">
                 <form action="/search/" method="get">
-                    <input type="hidden" name="repository" value="all" />
+                    <p><input type="hidden" name="repository" value="all" />
                     <input type="hidden" name="category" value="all" />
                     <input type="hidden" name="searchby" value="name" />
                     <input type="hidden" name="sortby" value="name" />
                     <input type="hidden" name="order" value="asc" />
                     <input type="hidden" name="limit" value="25" />
-                    <p>Package Search: <input type="test" maxlength="200" size="20" name="query" /></p>
+                    Package Search: <input type="text" maxlength="200" size="20" name="query" /></p>
                 </form>
             </div>
             {% endblock %}
             {% block content %}
             {% endblock %}
-        </div>
         <br />
+        </div>
         <div class="foot">
             <p>For more information please read the <a href="http://wiki.archlinux.org/index.php/AUR_User_Guidelines">AUR User Guidelines</a>.</p>
             Copyright &copy; 2002-2007, Judd Vinet &lt;<a href="mailto:jvinet@zeroflux.org">jvinet@zeroflux.org</a>&gt;<br /><br />
