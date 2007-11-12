@@ -1,11 +1,6 @@
 from django.conf.urls.defaults import *
 from archlinux.aur.models import Package
 
-index_dict = {
-    'queryset': Package.objects.all(),
-    'date_field': 'updated',
-}
-
 detail_dict = {
     'queryset': Package.objects.all(),
     'template_object_name': 'pkg',
