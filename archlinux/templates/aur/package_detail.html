@@ -48,9 +48,11 @@
             </td><td colspan="2" valign="top">
                 <div class="listing">
                     <h4>{% trans "Sources" %}:</h4>
-                    <ul style="font-size:small;list-style:none">
-                        <li>TODO</li>
-                    </ul>
+                    <ul style="font-size:small;list-style:none">{% ifnotequal pkg.packagefile_set.all.count 0 %}{% for source in pkg.packagefile_set.all %}
+                        <li>{{ source.filename|urlize }}</li>{% endfor %}
+                    {% else %}
+                        <li>None</li>
+                    {% endifnotequal %}</ul>
                 </div>
             </td>
         </tr>
