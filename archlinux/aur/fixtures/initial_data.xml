@@ -60,6 +60,54 @@
     <object pk="2" model="aur.architecture">
         <field type="CharField" name="name">x86_64</field>
     </object>
+    <object pk="1" model="aur.license">
+        <field type="CharField" name="name">APACHE</field>
+    </object>
+    <object pk="2" model="aur.license">
+        <field type="CharField" name="name">CDDL</field>
+    </object>
+    <object pk="3" model="aur.license">
+        <field type="CharField" name="name">CPL</field>
+    </object>
+    <object pk="4" model="aur.license">
+        <field type="CharField" name="name">EPL</field>
+    </object>
+    <object pk="5" model="aur.license">
+        <field type="CharField" name="name">FDL</field>
+    </object>
+    <object pk="6" model="aur.license">
+        <field type="CharField" name="name">GPL</field>
+    </object>
+    <object pk="7" model="aur.license">
+        <field type="CharField" name="name">GPL2</field>
+    </object>
+    <object pk="8" model="aur.license">
+        <field type="CharField" name="name">GPL3</field>
+    </object>
+    <object pk="9" model="aur.license">
+        <field type="CharField" name="name">LGPL</field>
+    </object>
+    <object pk="10" model="aur.license">
+        <field type="CharField" name="name">LGPL2</field>
+    </object>
+    <object pk="11" model="aur.license">
+        <field type="CharField" name="name">LGPL3</field>
+    </object>
+    <object pk="12" model="aur.license">
+        <field type="CharField" name="name">MPL</field>
+    </object>
+    <object pk="13" model="aur.license">
+        <field type="CharField" name="name">PHP</field>
+    </object>
+    <object pk="14" model="aur.license">
+        <field type="CharField" name="name">PerlArtistic</field>
+    </object>
+    <object pk="15" model="aur.license">
+        <field type="CharField" name="name">RALINK</field>
+    </object>
+    <object pk="16" model="aur.license">
+        <field type="CharField" name="name">RUBY</field>
+    </object>
     <object pk="1" model="aur.repository">
         <field type="CharField" name="name">Unsupported</field>
     </object>

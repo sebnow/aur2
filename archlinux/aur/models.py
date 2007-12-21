@@ -11,7 +11,6 @@ class Category(models.Model):
     class Admin:
         pass
 
-
     class Meta:
         verbose_name_plural = 'categories'
 
@@ -39,27 +38,58 @@ class Repository(models.Model):
         verbose_name_plural = 'repositories'
 
 
+class License(models.Model):
+    name = models.CharField(max_length=10)
+
+    def __unicode__(self):
+        return self.name
+
+    class Admin:
+        pass
+
+
+class Group(models.Model):
+    name = models.CharField(max_length=10)
+
+    def __unicode__(self):
+        return self.name
+
+    class Admin:
+        pass
+
+
 class Package(models.Model):
     name = models.CharField(primary_key=True, max_length=30)
     version = models.CharField(max_length=20)
     release = models.SmallIntegerField()
     description = models.CharField(max_length=180)
-    url = models.CharField(maxlength=200, null=True, blank=True)
+    url = models.CharField(max_length=200, null=True, blank=True)
     maintainers = models.ManyToManyField(User)
     repository = models.ForeignKey(Repository)
     category = models.ForeignKey(Category)
-    architecture = models.ManyToManyField(Architecture)
-    dep_packages = models.ManyToManyField('self', null=True, blank=True)
+    licenses = models.ManyToManyField(License, null=True, blank=True)
+    architectures = models.ManyToManyField(Architecture)
+    depends = models.ManyToManyField('self', null=True, blank=True,
+            related_name="reverse_depends", symmetrical=False)
+    make_depends = models.ManyToManyField('self', null=True, blank=True,
+            related_name="reverse_make_depends", symmetrical=False)
+    provides = models.ManyToManyField('self', null=True, blank=True,
+            related_name="reverse_provides", symmetrical=False)
+    replaces = models.ManyToManyField('self', null=True, blank=True,
+            related_name="reverse_replaces", symmetrical=False)
+    conflicts = models.ManyToManyField('self', null=True, blank=True,
+            related_name="reverse_conflicts", symmetrical=False)
     deleted = models.BooleanField(default=False)
     outdated = models.BooleanField(default=False)
     added = models.DateTimeField()
     updated = models.DateTimeField()
+    groups = models.ManyToManyField(Group, null=True, blank=True)
 
     def __unicode__(self):
-        return self.name
+        return "%s %s" % (self.name, self.version)
 
     def get_arch(self):
-        return ', '.join(map(str, self.architecture.all()))
+        return ', '.join(map(str, self.architectures.all()))
     get_arch.short_description = 'architectures'
 
     class Admin:
@@ -69,20 +99,31 @@ class Package(models.Model):
         ordering = ('-updated',)
         get_latest_by = 'updated'
 
+
 class PackageFile(models.Model):
     package = models.ForeignKey(Package)
     filename = models.CharField(max_length=100)
 
+    def __unicode__(self):
+        return self.filename
+
+    class Admin:
+        pass
+
 class PackageHash(models.Model):
-    package = models.ForeignKey(Package)
-    type = models.IntegerField()
-    hash = models.CharField(max_length=64)
+    # sha512 hashes are 128 characters
+    hash = models.CharField(max_length=128, primary_key=True)
+    type = models.CharField(max_length=12)
+    file = models.ForeignKey(PackageFile)
 
     def __unicode__(self):
         return self.hash
 
     class Meta:
-        verbose_name_plural = 'packagehashes'
+        verbose_name_plural = 'package hashes'
+
+    class Admin:
+        pass
 
 
 class Comment(models.Model):
@@ -92,8 +133,8 @@ class Comment(models.Model):
     message = models.TextField()
     added = models.DateTimeField()
     ip = models.IPAddressField()
-    hidden = models.BooleanField()
-    commit = models.BooleanField()
+    hidden = models.BooleanField(default=False)
+    commit = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.message
