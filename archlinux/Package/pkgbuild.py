@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-from __future__ import with_statement
-
 import os
 import subprocess
+
+class InavlidPackage(Exception):
+    pass
 
 class Package:
     """Representation of an Archlinux package"""
@@ -21,20 +22,22 @@ class Package:
         if file.endswith('.tar.gz'):
             import tarfile
             import tempfile
-            tar = tarfile.open(file, "r")
-            if not tar:
-                return None
-            to_extract = None
-            for member in tar.getnames():
-                if member.find("PKGBUILD") >= 0:
-                    to_extract = member
-                    break
-            if not to_extract:
-                return None
-            directory = tempfile.mkdtemp()
-            tar.extract(to_extract, directory)
-            file = os.path.join(directory, to_extract)
-            is_temporary = True
+            try:
+                tar = tarfile.open(file, "r")
+            except:
+                raise
+            else:
+                to_extract = None
+                for member in tar.getnames():
+                    if member.find("PKGBUILD") >= 0:
+                        to_extract = member
+                        break
+                if not to_extract:
+                    raise InavlidPackage('tar file does not contain a PKGBUILD')
+                directory = tempfile.mkdtemp()
+                tar.extract(to_extract, directory)
+                file = os.path.join(directory, to_extract)
+                is_temporary = True
 
         # Find the current directory and filename
         working_dir = os.path.dirname(file)
@@ -49,13 +52,12 @@ class Package:
         process.wait()
 
         if process.returncode != 0:
-            return None
+            raise InavlidPackage("missing variables")
 
         # "Import" variables into local namespace
         for expression in process.stdout.readlines():
             exec 'temp = dict(' + expression.rstrip() + ')'
             self._data.update(temp)
-
 
         # Remove the temporary file since we don't need it
         if is_temporary:
@@ -75,7 +77,7 @@ class Package:
         return self._data.keys()
 
     def __str__(self):
-        return self._data.__str__()
+        return str(self._data)
 
     def __unicode__(self):
-        return self._data.__unicode__()
+        return unicode(self._data)
