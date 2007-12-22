@@ -1,6 +1,11 @@
 from django.db import models
 from django.contrib.admin.models import User
 from django import newforms as forms # This will change to forms in 0.98 or 1.0
+from django.core.mail import send_mass_mail
+from django.db.models import signals
+from django.dispatch import dispatcher
+
+from django.template.loader import render_to_string
 
 class Category(models.Model):
     name = models.CharField(max_length=20)
@@ -143,6 +148,16 @@ class Comment(models.Model):
         pass
 
 
+class PackageNotification(models.Model):
+    user = models.ForeignKey(User)
+    package = models.ForeignKey(Package)
+
+    def __unicode__(self):
+        return "%s subscription to %s updates" % (self.user.username, self.package.name)
+
+    class Admin:
+        pass
+
 class PackageSearchForm(forms.Form):
     # Borrowed from AUR2-BR
     def __init__(self, *args, **kwargs):
@@ -190,3 +205,25 @@ class PackageSubmitForm(forms.Form):
     category = forms.ChoiceField(choices=())
     file = forms.FileField(label="PKGBUILD")
     comment = forms.CharField(widget=forms.Textarea, label="Commit Message")
+
+# Should this be here?
+def email_package_updates(sender, instance, signal, *args, **kwargs):
+    """Send notification to users of modification to a Package"""
+    subject = "Archlinux AUR: %s updated" % instance.name
+    sender = 'xilon'
+    mail_list = []
+    notifications = PackageNotification.objects.filter(package=instance)
+    for notification in notifications:
+        message = render_to_string('aur/email_notification.txt', {
+            'package': instance,
+            'user': notification.user,
+        })
+        mail_list.append((subject, message, sender,
+            (notification.user.email,)))
+    return send_mass_mail(mail_list)
+
+# Send notifications of updates to users on saves and deltion of packages
+dispatcher.connect(email_package_updates, signal=signals.post_save,
+        sender=Package)
+dispatcher.connect(email_package_updates, signal=signals.post_delete,
+        sender=Package)
