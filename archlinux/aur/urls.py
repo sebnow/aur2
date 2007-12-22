@@ -6,10 +6,11 @@ detail_dict = {
     'template_object_name': 'pkg',
 }
 
-urlpatterns = patterns('',
-    (r'^$', 'archlinux.aur.views.search'),
-    (r'^search/$', 'archlinux.aur.views.search'),
-    (r'^submit/$', 'archlinux.aur.views.submit'),
+urlpatterns = patterns('archlinux.aur.views',
+    (r'^$', 'search'),
+    (r'^search/$', 'search'),
+    (r'^submit/$', 'submit'),
+    (r'^package/(?P<object_id>\w+)/comment/$', 'comment'),
 )
 
 # Generic views
