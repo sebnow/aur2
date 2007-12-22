@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% block extra_title %} - Submit package{% endblock %}
 {% block content %}
 <div class="greybox">
     <form action="." method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
