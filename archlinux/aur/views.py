@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 from django.db import transaction
 
 from archlinux.aur.models import *
-import Package as PKGBUILD
+import archlinux.aur.Package as PKGBUILD
 import datetime
 
 def search(request, query = ''):
