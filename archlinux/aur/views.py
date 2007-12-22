@@ -1,7 +1,7 @@
 from re import sub
 import os
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from BetterPaginator import BetterPaginator
 from django import newforms as forms # This will change to forms in 0.68 or 1.0
@@ -192,3 +192,23 @@ def submit(request):
         'user': request.user,
         'form': form,
     })
+
+def comment(request, object_id):
+    if request.POST and 'message' in request.POST:
+        package = get_object_or_404(Package, name=object_id)
+        comment = Comment(package=package, user=request.user,
+                message=request.POST['message'], added=datetime.datetime.now(),
+                ip=request.META['REMOTE_ADDR'])
+        if 'reply_to' in request.POST:
+            comment.parent=request.POST['reply_to']
+        comment.save()
+        return HttpResponseRedirect(
+                reverse('django.views.generic.list_detail.object_detail',
+                args=[object_id,]))
+    elif 'reply_to' in request.POST:
+        return render_to_response('aur/comment_form.html', {'user': request.user,
+            'package_id': object_id, 'reply_to': request.POST['reply_to']})
+    else:
+        return HttpResponseRedirect(
+                reverse('django.views.generic.list_detail.object_detail',
+                args=[object_id,]))
