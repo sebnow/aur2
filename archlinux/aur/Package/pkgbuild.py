@@ -2,7 +2,7 @@
 import os
 import subprocess
 
-class InavlidPackage(Exception):
+class InvalidPackage(Exception):
     pass
 
 class Package:
@@ -33,7 +33,7 @@ class Package:
                         to_extract = member
                         break
                 if not to_extract:
-                    raise InavlidPackage('tar file does not contain a PKGBUILD')
+                    raise InvalidPackage('tar file does not contain a PKGBUILD')
                 directory = tempfile.mkdtemp()
                 tar.extract(to_extract, directory)
                 file = os.path.join(directory, to_extract)
@@ -52,7 +52,7 @@ class Package:
         process.wait()
 
         if process.returncode != 0:
-            raise InavlidPackage("missing variables")
+            raise InvalidPackage("missing variables")
 
         # "Import" variables into local namespace
         for expression in process.stdout.readlines():
