@@ -44,7 +44,7 @@ class Repository(models.Model):
 
 
 class License(models.Model):
-    name = models.CharField(max_length=10)
+    name = models.CharField(max_length=24)
 
     def __unicode__(self):
         return self.name
