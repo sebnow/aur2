@@ -170,7 +170,7 @@ class PackageSearchForm(forms.Form):
         self.fields['repository'].choices = repository_choices
 
     repository = forms.ChoiceField(initial='all', choices=())
-    category = forms.ChoiceField(initial='a', choices=())
+    category = forms.ChoiceField(initial='all', choices=())
     query = forms.CharField(max_length=30, label="Keywords", required=False)
     searchby = forms.ChoiceField(initial='name', label="Search By",choices=(
         ('name', 'Package Name'),
@@ -187,13 +187,51 @@ class PackageSearchForm(forms.Form):
         ('asc', 'Ascending'),
         ('desc', 'Descending'),
     ))
-    limit = forms.ChoiceField(initial='50', choices=(
+    limit = forms.ChoiceField(initial='25', choices=(
         (25, 25),
         (50, 50),
         (75, 75),
         (100, 100),
         (150, 150),
     ))
+
+    def get_or_default(self, key):
+        if not self.is_bound:
+            return self.fields[key].initial
+        return self.cleaned_data.get(key, self.fields[key].initial)
+
+    def search(self):
+        if self.is_bound and not self.is_valid():
+            return None
+        repository = self.get_or_default('repository')
+        lastupdate = self.get_or_default('lastupdate')
+        category = self.get_or_default('category')
+        sortby = self.get_or_default('sortby')
+        order = self.get_or_default('order')
+
+        # Find the packages by searching description and package name or maintainer
+        if self.get_or_default('query'):
+            if self.get_or_default('searchby') == 'maintainer':
+                results = Package.objects.filter(maintainers__username__icontains=self.cleaned_data["query"])
+            else:
+                res1 = Package.objects.filter(name__icontains=self.cleaned_data["query"])
+                res2 = Package.objects.filter(description__icontains=self.cleaned_data["query"])
+                results = res1 | res2
+        else:
+            results = Package.objects.all()
+        # Restrict results
+        if repository != 'all':
+            results = results.filter(repository__name__iexact=repository)
+        if category != 'all':
+            results = results.filter(category__name__exact=category)
+        if lastupdate:
+            results = results.filter(updated__gte=lastupdate)
+        # Change the sort order if necessary
+        if order == 'desc':
+            results = results.order_by('-' + sortby, 'repository', 'category', 'name')
+        else:
+            results = results.order_by(sortby, 'repository', 'category', 'name')
+        return results
 
 class PackageSubmitForm(forms.Form):
     # Borrowed from AUR2-BR

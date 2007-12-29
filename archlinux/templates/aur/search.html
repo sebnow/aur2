@@ -19,7 +19,7 @@
                 {% endfor %}
                 <td><input type="submit" value="Search" /></td>
             </tr>
-            {% if not form.is_valid %}
+            {% if is_bound and not form.is_valid %}
             <tr>
                 {% for field in form %}
                 <td class="error smalltext">{% if field.errors %}
@@ -44,7 +44,7 @@
             <th>{% trans "Maintainer" %}</th>
             <th style="width: 9em">{% trans "Last Updated" %}</th>
         </tr>
-        {% if packages %}
+        {% ifnotequal packages.count 0 %}
         {% for package in packages %}
         <tr class="{% cycle 'pkgr1' 'pkgr2' %}">
             <td>{{ package.repository }}</td>
@@ -56,10 +56,16 @@
         </tr>
         {% endfor %}
         {% else %}
+        {% if form.is_bound %}
+        <tr>
+            <td colspan="6" style="text-align: center"><p>There were no results for your query</p></td>
+        </tr>
+        {% else %}
         <tr>
             <td colspan="6" style="text-align: center"><p>There are currently no packages available</p></td>
         </tr>
         {% endif %}
+        {% endifnotequal %}
     </table>{% if pager.has_pagination %}
     <br />
     {% if pager.has_previous_page %}<span style="float: left"><a href="{{ pager.previous_link }}">&lt;&lt;&lt; Previous</a></span>{% endif %}
