@@ -82,15 +82,16 @@ def submit(request):
         if not form.is_valid():
             return render_to_response('aur/submit.html', {
                 'user': request.user, 'form': form})
-
+        import tempfile
+        directory = tempfile.mkdtemp()
+        filename = os.path.join(directory, form.cleaned_data['file'].filename)
         # Save the uploaded file to disk
-        fp = open(form.cleaned_data['file'].filename, "wb")
+        fp = open(filename, "wb")
         fp.write(form.cleaned_data['file'].content)
         fp.close()
 
         try:
-            pkg = PKGBUILD.Package(os.path.join(os.getcwd(),
-                form.cleaned_data["file"].filename))
+            pkg = PKGBUILD.Package(os.path.join(os.getcwd(), filename))
         except PKGBUILD.InvalidPackage, e:
             # TODO: Add error to form
             return render_to_response('aur/submit.html', {
@@ -102,7 +103,6 @@ def submit(request):
                 release=pkg['release'], description=pkg['description'],
                 url=pkg['url'])
 
-        package.maintainers.add(request.user)
         package.repository=Repository.objects.get(name__exact="Unsupported")
         package.category=Category.objects.get(name__iexact=form.cleaned_data['category'])
 
@@ -123,6 +123,12 @@ def submit(request):
             else:
                 package.depends.add(dep)
 
+        package.updated = datetime.datetime.now()
+        package.added = datetime.datetime.now()
+
+        # Save the package so we can reference it
+        package.save()
+        package.maintainers.add(request.user)
         for license in pkg['licenses']:
             object, created = License.objects.get_or_create(name=license)
             package.licenses.add(object)
@@ -138,11 +144,6 @@ def submit(request):
             else:
                 package.architectures.add(object)
 
-        package.updated = datetime.datetime.now()
-        package.added = datetime.datetime.now()
-
-        # Save the package so we can reference it
-        package.save()
         for index in range(len(pkg['source'])):
             source = PackageFile(package=package,
                     filename=pkg['source'][index])
