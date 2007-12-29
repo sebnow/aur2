@@ -16,5 +16,5 @@ urlpatterns = patterns('archlinux.aur.views',
 # Generic views
 # These will probably be removed at a later stage
 urlpatterns += patterns('django.views.generic',
-    (r'^package/(?P<object_id>[\w-]+)/$', 'list_detail.object_detail', dict(detail_dict)),
+    (r'^package/(?P<object_id>[\w-]+)/$', 'list_detail.object_detail', dict(detail_dict), 'package-detail'),
 )
