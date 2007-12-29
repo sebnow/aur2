@@ -26,6 +26,10 @@ def search(request, query = ''):
         form = PackageSearchForm()
     # Execute the search
     results = form.search()
+    # If we only got one hit, just go to the package's detail page
+    if results.count() == 1:
+        return HttpResponseRedirect(reverse('package-detail',
+            args=[results[0].name,]))
     # Replace the current page with the new one if it's already in GET
     if request.GET.has_key('page'):
         link_template = sub(r'page=\d+', 'page=%d', request.get_full_path())
