@@ -2,6 +2,20 @@
 {% load i18n %}
 {% block extra_title %} - Submit package{% endblock %}
 {% block content %}
+{% if errors or warnings %}
+<div class="greybox errors">
+    <p style="padding:0px;">Your package failed to validate. Here's why:</p>
+    <ul>
+        {% for error in errors %}
+        <li class="error">Error: {{ error }}</li>
+        {% endfor %}
+        {% for warning in warnings %}
+        <li class="error" style="color:#f57900">Warning: {{ warning }}</li>
+        {% endfor %}
+    </ul>
+</div>
+<br />
+{% endif %}
 <div class="greybox">
     <form action="." method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
         <table>{% for field in form %}

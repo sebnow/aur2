@@ -59,11 +59,16 @@ def submit(request):
         fp.close()
 
         try:
-            pkg = PKGBUILD.Package(os.path.join(os.getcwd(), filename))
+            pkg = PKGBUILD.Package(filename)
         except PKGBUILD.InvalidPackage, e:
             # TODO: Add error to form
             return render_to_response('aur/submit.html', {
-                'user': request.user, 'form': form})
+                'user': request.user, 'form': form, 'errors': [e,]})
+        pkg.validate()
+        if not pkg.is_valid() or pkg.has_warnings():
+            return render_to_response('aur/submit.html', {
+                'user': request.user, 'form': form, 'errors': pkg.get_errors(),
+                'warnings': pkg.get_warnings()})
 
         # Check if we are updating an existing package or creating one
 
@@ -84,10 +89,8 @@ def submit(request):
             try:
                 dep = Package.objects.get(name__exact=dependency)
             except Package.DoesNotExist:
-                return render_to_response('aur/submit.html', {
-                    'user': request.user,
-                    'form': form,
-                })
+                # Fail silently
+                pass
             else:
                 package.depends.add(dep)
 
@@ -108,6 +111,7 @@ def submit(request):
                 return render_to_response('aur/submit.html', {
                     'user': request.user,
                     'form': form,
+                    'errors': ['architecture %s does not exist' % arch,],
                 })
             else:
                 package.architectures.add(object)
