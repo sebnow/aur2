@@ -32,15 +32,7 @@ def search(request, query = ''):
             results = Package.objects.all()
 
     else:
-        form_data = {
-            'repository': 'all',
-            'category': 'all',
-            'searchby': 'name',
-            'sortby': 'name',
-            'order': 'asc',
-            'limit': '25',
-        }
-        form = PackageSearchForm(form_data)
+        form = PackageSearchForm()
 
         # We need to validate to get form.cleaned_data
         if not form.is_valid():
