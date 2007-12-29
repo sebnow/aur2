@@ -7,14 +7,10 @@ exec /bin/bash --noprofile --norc -r << EOF
 
 source $1
 
-if [ "x\$pkgname" = "x" -o "x\$pkgver" = "x" -o "x\$pkgrel" = "x" ]; then
-    exit 1
-fi
-
 print_var()
 {
     if [ ! "x\$2" = "x" ]; then
-        echo -e "\$1 = '\$2'"
+        echo -e "\$1 = '\${2//\'/\\\\\'}'"
     else
         echo "\$1 = None"
     fi
