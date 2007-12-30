@@ -2,6 +2,8 @@
 import os
 import subprocess
 import re
+import tarfile
+import tempfile
 
 class InvalidPackage(Exception):
     pass
@@ -24,32 +26,32 @@ class Package:
 
     def load(self, file):
         """Parse a PKGBUILD (can be within a tar file) and import the variables"""
+        if not os.path.exists(file):
+            raise Exception("file does not exist")
         script_dir = os.path.dirname(__file__)
         if not script_dir:
             script_dir = os.path.abspath(script_dir)
         is_temporary = False
 
         # Check if it's a tarballed PKGBUILD and extract it
-        if file.endswith('.tar.gz'):
-            import tarfile
-            import tempfile
-            try:
-                tar = tarfile.open(file, "r")
-            except:
+        try:
+            tar = tarfile.open(file, "r")
+        except:
+            if os.path.basename(file) != "PKGBUILD":
                 raise
-            else:
-                to_extract = None
-                for member in tar.getnames():
-                    if member.find("PKGBUILD") >= 0:
-                        to_extract = member
-                        break
-                if not to_extract:
-                    raise InvalidPackage('tar file does not contain a PKGBUILD')
-                # Create a temporary directory and extract to it
-                directory = tempfile.mkdtemp()
-                tar.extract(to_extract, directory)
-                file = os.path.join(directory, to_extract)
-                is_temporary = True
+        else:
+            to_extract = None
+            for member in tar.getnames():
+                if member.find("PKGBUILD") >= 0:
+                    to_extract = member
+                    break
+            if not to_extract:
+                raise InvalidPackage('tar file does not contain a PKGBUILD')
+            # Create a temporary directory and extract to it
+            directory = tempfile.mkdtemp()
+            tar.extract(to_extract, directory)
+            file = os.path.join(directory, to_extract)
+            is_temporary = True
 
         # Find the current directory and filename
         working_dir = os.path.dirname(file)
