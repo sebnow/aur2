@@ -182,3 +182,9 @@ def comment(request, object_id):
         return HttpResponseRedirect(
                 reverse('django.views.generic.list_detail.object_detail',
                 args=[object_id,]))
+
+def flag_out_of_date(request, object_id):
+    package = get_object_or_404(Package, name=object_id)
+    package.outdated = True
+    package.save()
+    return HttpResponseRedirect(reverse('package-detail', args=[object_id,]))
