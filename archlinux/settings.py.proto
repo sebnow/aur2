@@ -72,6 +72,13 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+FIXTURE_DIRS = (
+    # Place directories where django should look for fixtures in.
+    # Strings should be like "/home/html/myproject/fixtures/"
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+)
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
