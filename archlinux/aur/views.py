@@ -1,5 +1,6 @@
 from re import sub
 import os
+import sys
 
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
@@ -64,10 +65,10 @@ def submit(request):
 
         try:
             pkg = PKGBUILD.Package(filename)
-        except PKGBUILD.InvalidPackage, e:
+        except:
             # TODO: Add error to form
             return render_to_response('aur/submit.html', {
-                'user': request.user, 'form': form, 'errors': [e,]})
+                'user': request.user, 'form': form, 'errors': sys.exc_info()[1]})
         pkg.validate()
         if not pkg.is_valid() or pkg.has_warnings():
             return render_to_response('aur/submit.html', {
