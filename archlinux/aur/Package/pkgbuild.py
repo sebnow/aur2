@@ -4,15 +4,16 @@ import subprocess
 import re
 import tarfile
 import tempfile
+from UserDict import UserDict
 
 class InvalidPackage(Exception):
     pass
 
 
-class Package:
+class Package(UserDict):
     """Representation of an Archlinux package"""
     def __init__(self, file):
-        self._data = {}
+        UserDict.__init__(self)
         self._required_fields = (
             'name', 'description', 'version', 'release',
             'licenses', 'arch',
@@ -68,7 +69,7 @@ class Package:
         # "Import" variables into local namespace
         for expression in process.stdout.readlines():
             exec 'temp = dict(' + expression.rstrip() + ')'
-            self._data.update(temp)
+            self.update(temp)
 
         # Remove the temporary file since we don't need it
         if is_temporary:
@@ -79,25 +80,25 @@ class Package:
         """Validate PKGBUILD for missing or invalid fields"""
         # Search for missing fields
         for field in self._required_fields:
-            if not self._data[field]:
+            if not self[field]:
                 self._errors.append('%s field is required' % field)
-        if not re.compile("^[\w\d_-]+$").match(self._data['name']):
+        if not re.compile("^[\w\d_-]+$").match(self['name']):
             self._errors.append('package name must be alphanumeric')
-        elif not re.compile("[a-z\d_-]+").match(self._data['name']):
+        elif not re.compile("[a-z\d_-]+").match(self['name']):
             self._warnings.append('package name should be in lower case')
         # Description isn't supposed to be longer than 80 characters
-        if self._data['description'] and len(self._data['description']) > 80:
+        if self['description'] and len(self['description']) > 80:
             self._warnings.append('description should not exceed 80 characters')
         # Make sure the number of sources and checksums is the same
         found_sums = False
         for checksum in ('md5sums', 'sha1sums', 'sha256sums', 'sha384sums',
                          'sha512sums'):
-            if self._data[checksum]:
+            if self[checksum]:
                 found_sums = True
-                if len(self._data[checksum]) != len(self._data['source']):
+                if len(self[checksum]) != len(self['source']):
                     self._errors.append('amount of %s and sources does not match'
                             % checksum)
-        if self._data['source'] and not found_sums:
+        if self['source'] and not found_sums:
             self._errors.append('sources exist without checksums')
         # Set some variables to quickly determine whether the package is valid
         self._validated = True
@@ -126,21 +127,3 @@ class Package:
     def get_warnings(self):
         """Retrieve a list of warnings"""
         return self._warnings
-
-    def __getitem__(self, key):
-        return self._data[key]
-
-    def __setitem__(self, key, value):
-        self._data[key] = value
-
-    def __contains__(self, item):
-        return self._data.__contains__(item)
-
-    def keys(self):
-        return self._data.keys()
-
-    def __str__(self):
-        return str(self._data)
-
-    def __unicode__(self):
-        return unicode(self._data)
