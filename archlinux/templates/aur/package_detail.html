@@ -9,6 +9,13 @@
             <li><a href="#">{% trans "View $SCM Entries" %}</a></li>
             <li><a href="/package/{{ pkg.name }}/files/">View File List</a></li>
             <li><a href="/package/{{ pkg.name }}//">Notify me of updates</a></li>
+            <li>
+            {% if pkg.outdated %}
+                <em>This package has been flagged out-of-date</em>
+            {% else %}
+                <a href="{% url archlinux.aur.views.flag_out_of_date object_id=pkg.name %}">Flag Package Out-of-Date</a>
+            {% endif %}
+            </li>
         </ul>
     </div>
     <table class="listing">

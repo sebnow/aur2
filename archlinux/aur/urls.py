@@ -11,6 +11,7 @@ urlpatterns = patterns('archlinux.aur.views',
     (r'^search/$', 'search'),
     (r'^submit/$', 'submit'),
     (r'^package/(?P<object_id>\w+)/comment/$', 'comment'),
+    (r'^package/(?P<object_id>[\w_-]+)/flag_out_of_date/$', 'flag_out_of_date'),
 )
 
 # Generic views

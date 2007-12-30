@@ -7,6 +7,8 @@ from django.dispatch import dispatcher
 
 from django.template.loader import render_to_string
 
+import datetime
+
 class Category(models.Model):
     name = models.CharField(max_length=20)
 
@@ -96,6 +98,11 @@ class Package(models.Model):
     def get_arch(self):
         return ', '.join(map(str, self.architectures.all()))
     get_arch.short_description = 'architectures'
+
+    def save(self):
+        self.updated = datetime.datetime.now()
+        self.outdated = False
+        super(Package, self).save()
 
     class Admin:
         list_display = ('name', 'category', 'get_arch', 'updated')
