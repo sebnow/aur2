@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block extra_title %} - Submit package{% endblock %}
+{% block extra_title %} - {% trans "Submit package" %}{% endblock %}
 {% block content %}
 {% if errors or warnings %}
 <div class="greybox errors">
-    <p style="padding:0px;">Your package failed to validate. Here's why:</p>
+    <p style="padding:0px;">{% trans "Your package failed to validate. Here's why" %}:</p>
     <ul>
         {% for error in errors %}
-        <li class="error">Error: {{ error }}</li>
+        <li class="error">{% trans "Error" %}: {{ error }}</li>
         {% endfor %}
         {% for warning in warnings %}
-        <li class="error" style="color:#f57900">Warning: {{ warning }}</li>
+        <li class="error" style="color:#f57900">{% trans "Warning" %}: {{ warning }}</li>
         {% endfor %}
     </ul>
 </div>

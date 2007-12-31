@@ -7,13 +7,13 @@
     <div style="float:right" class="listing">
         <ul class="small">
             <li><a href="#">{% trans "View $SCM Entries" %}</a></li>
-            <li><a href="/package/{{ pkg.name }}/files/">View File List</a></li>
-            <li><a href="/package/{{ pkg.name }}//">Notify me of updates</a></li>
+            <li><a href="/package/{{ pkg.name }}/files/">{% trans "View File List" %}</a></li>
+            <li><a href="/package/{{ pkg.name }}//">{% trans "Notify me of updates" %}</a></li>
             <li>
             {% if pkg.outdated %}
-                <em>This package has been flagged out-of-date</em>
+                <em>{% trans "This package has been flagged out-of-date" %}</em>
             {% else %}
-                <a href="{% url archlinux.aur.views.flag_out_of_date object_id=pkg.name %}">Flag Package Out-of-Date</a>
+                <a href="{% url archlinux.aur.views.flag_out_of_date object_id=pkg.name %}">{% trans "Flag Package Out-of-Date" %}</a>
             {% endif %}
             </li>
         </ul>
@@ -51,7 +51,7 @@
                     <ul style="font-size:small;list-style:none">{% ifnotequal pkg.depends.all.count 0 %}{% for dep in pkg.depends.all %}
                         <li><a href="{% url django.views.generic.list_detail.object_detail object_id=dep.name %}">{{ dep.name }}</a></li>{% endfor %}
                     {% else %}
-                        <li>None</li>
+                        <li>{% trans "None" %}</li>
                     {% endifnotequal %}</ul>
                 </div>
             </td><td colspan="2" valign="top">
@@ -60,7 +60,7 @@
                     <ul style="font-size:small;list-style:none">{% ifnotequal pkg.packagefile_set.all.count 0 %}{% for source in pkg.packagefile_set.all %}
                         <li>{{ source.filename|urlize }}</li>{% endfor %}
                     {% else %}
-                        <li>None</li>
+                        <li>{% trans "None" %}</li>
                     {% endifnotequal %}</ul>
                 </div>
             </td>

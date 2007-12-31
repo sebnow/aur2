@@ -3,7 +3,7 @@
 {% block search %}{% endblock %}
 {% block content %}
 <div class="greybox">
-    <h4 style="text-align: right">Search Criteria</h4>
+    <h4 style="text-align: right">{% trans "Search Criteria" %}</h4>
     <hr />
     <form method="get" action="/search/">
         <table width="100%">
@@ -58,18 +58,18 @@
         {% else %}
         {% if form.is_bound %}
         <tr>
-            <td colspan="6" style="text-align: center"><p>There were no results for your query</p></td>
+            <td colspan="6" style="text-align: center"><p>{% trans "There were no results for your query" %}</p></td>
         </tr>
         {% else %}
         <tr>
-            <td colspan="6" style="text-align: center"><p>There are currently no packages available</p></td>
+            <td colspan="6" style="text-align: center"><p>{% trans "There are currently no packages available" %}</p></td>
         </tr>
         {% endif %}
         {% endifnotequal %}
     </table>{% if pager.has_pagination %}
     <br />
-    {% if pager.has_previous_page %}<span style="float: left"><a href="{{ pager.previous_link }}">&lt;&lt;&lt; Previous</a></span>{% endif %}
-    {% if pager.has_next_page %}<span style="float: right"><a href="{{ pager.next_link }}">Next &gt;&gt;&gt;</a></span>{% endif %}
+    {% if pager.has_previous_page %}<span style="float: left"><a href="{{ pager.previous_link }}">&lt;&lt;&lt; {% trans "Previous" %}</a></span>{% endif %}
+    {% if pager.has_next_page %}<span style="float: right"><a href="{{ pager.next_link }}">{% trans "Next" %} &gt;&gt;&gt;</a></span>{% endif %}
     <div style="text-align: center; width:75%; margin: auto;">
     {% for set in pager.windowed_page_links %}
         {% if not forloop.first %}...{% endif %}
