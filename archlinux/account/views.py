@@ -62,6 +62,7 @@ def profile(request):
 
     return render_to_response('registration/profile.html', {
         'packages': packages,
+        'packages_out_of_date': packages.filter(outdated=True).count(),
         'user': request.user,
         'form': form,
     })
