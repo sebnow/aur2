@@ -48,7 +48,7 @@
         {% for package in packages %}
         <tr class="{% cycle 'pkgr1' 'pkgr2' %}">
             <td>{{ package.repository }}</td>
-            <td><a{% if package.outdated %} class="error"{% endif %} href="/package/{{package.name}}/">{{ package.name }} {{ package.version }}-{{ package.release }}</a></td>
+            <td><a{% if package.outdated %} class="error"{% endif %} href="{{ package.get_absolute_url }}">{{ package.name }} {{ package.version }}-{{ package.release }}</a></td>
             <td>{{ package.description }}</td>
             <td>{{ package.category.name }}</td>
             <td>{{ package.maintainers.all|join:", " }}</td>

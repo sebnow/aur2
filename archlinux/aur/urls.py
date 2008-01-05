@@ -7,15 +7,18 @@ detail_dict = {
 }
 
 urlpatterns = patterns('archlinux.aur.views',
-    (r'^$', 'search'),
-    (r'^search/$', 'search'),
-    (r'^submit/$', 'submit'),
-    (r'^package/(?P<object_id>\w+)/comment/$', 'comment'),
-    (r'^package/(?P<object_id>[\w_-]+)/flag_out_of_date/$', 'flag_out_of_date'),
+    url(r'^$', 'search', name='aur-main'),
+    url(r'^search/$', 'search', name='aur-search'),
+    url(r'^submit/$', 'submit', name='aur-submit_package'),
+    url(r'^package/(?P<object_id>[\w_-]+)/comment/$', 'comment',
+        name='aur-comment_on_package'),
+    url(r'^package/(?P<object_id>[\w_-]+)/flag_out_of_date/$',
+        'flag_out_of_date', name='aur-flag_out_of_date'),
 )
 
 # Generic views
 # These will probably be removed at a later stage
 urlpatterns += patterns('django.views.generic',
-    (r'^package/(?P<object_id>[\w-]+)/$', 'list_detail.object_detail', dict(detail_dict), 'package-detail'),
+    (r'^package/(?P<object_id>[\w_-]+)/$', 'list_detail.object_detail',
+        dict(detail_dict), 'aur-package_detail'),
 )

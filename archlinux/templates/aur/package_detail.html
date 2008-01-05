@@ -13,7 +13,7 @@
             {% if pkg.outdated %}
                 <em>{% trans "This package has been flagged out-of-date" %}</em>
             {% else %}
-                <a href="{% url archlinux.aur.views.flag_out_of_date object_id=pkg.name %}">{% trans "Flag Package Out-of-Date" %}</a>
+                <a href="{% url aur-flag_out_of_date object_id=pkg.name %}">{% trans "Flag Package Out-of-Date" %}</a>
             {% endif %}
             </li>
         </ul>
@@ -36,7 +36,7 @@
             <td><a href="{{ pkg.url }}">{{ pkg.url }}</a></td>
             </tr>{% endif %}<tr>
             <th>{% trans "Maintainer" %}:</th>
-            <td>{% for maintainer in pkg.maintainers.all %}{{ maintainer.username }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+            <td>{{ pkg.maintainers.all|join:", " }}</td>
         </tr><tr>
             <th>{% trans "Last Updated" %}:</th>
             <td>{{ pkg.updated|date:"Y-m-d H:i:s" }}</td>
@@ -48,8 +48,11 @@
             <td valign="top">
                 <div class="listing">
                     <h4>{% trans "Dependencies" %}:</h4>
-                    <ul style="font-size:small;list-style:none">{% ifnotequal pkg.depends.all.count 0 %}{% for dep in pkg.depends.all %}
-                        <li><a href="{% url django.views.generic.list_detail.object_detail object_id=dep.name %}">{{ dep.name }}</a></li>{% endfor %}
+                    <ul style="font-size:small;list-style:none">
+                    {% ifnotequal pkg.depends.all.count 0 %}
+                        {% for dep in pkg.depends.all %}
+                        <li><a href="{{ dep.get_absolute_url }}">{{ dep.name }}</a></li>
+                        {% endfor %}
                     {% else %}
                         <li>{% trans "None" %}</li>
                     {% endifnotequal %}</ul>
@@ -57,8 +60,11 @@
             </td><td colspan="2" valign="top">
                 <div class="listing">
                     <h4>{% trans "Sources" %}:</h4>
-                    <ul style="font-size:small;list-style:none">{% ifnotequal pkg.packagefile_set.all.count 0 %}{% for source in pkg.packagefile_set.all %}
-                        <li>{{ source.filename|urlize }}</li>{% endfor %}
+                    <ul style="font-size:small;list-style:none">
+                    {% ifnotequal pkg.packagefile_set.all.count 0 %}
+                        {% for source in pkg.packagefile_set.all %}
+                        <li>{{ source.filename|urlize }}</li>
+                        {% endfor %}
                     {% else %}
                         <li>{% trans "None" %}</li>
                     {% endifnotequal %}</ul>
