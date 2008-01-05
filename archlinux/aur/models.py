@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.admin.models import User
 from django import newforms as forms # This will change to forms in 0.98 or 1.0
 from django.core.mail import send_mass_mail
-from django.db.models import signals
+from django.db.models import signals, permalink
 from django.dispatch import dispatcher
 
 from django.template.loader import render_to_string
@@ -98,6 +98,10 @@ class Package(models.Model):
     def get_arch(self):
         return ', '.join(map(str, self.architectures.all()))
     get_arch.short_description = 'architectures'
+
+    def get_absolute_url(self):
+        return ('aur-package_detail', [self.name,])
+    get_absolute_url = permalink(get_absolute_url)
 
     def save(self):
         self.updated = datetime.datetime.now()

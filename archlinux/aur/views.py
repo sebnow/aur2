@@ -29,7 +29,7 @@ def search(request, query = ''):
     results = form.search()
     # If we only got one hit, just go to the package's detail page
     if results.count() == 1:
-        return HttpResponseRedirect(reverse('package-detail',
+        return HttpResponseRedirect(reverse('aur-package_detail',
             args=[results[0].name,]))
     # Replace the current page with the new one if it's already in GET
     if request.GET.has_key('page'):
@@ -153,8 +153,7 @@ def submit(request):
                 added=datetime.datetime.now())
         comment.save()
         return HttpResponseRedirect(
-                reverse('django.views.generic.list_detail.object_detail',
-                    args=[package.name,]))
+                reverse('aur-package_detail', args=[package.name,]))
     else:
         form = PackageSubmitForm()
 
@@ -172,19 +171,21 @@ def comment(request, object_id):
         if 'reply_to' in request.POST:
             comment.parent=request.POST['reply_to']
         comment.save()
-        return HttpResponseRedirect(
-                reverse('django.views.generic.list_detail.object_detail',
-                args=[object_id,]))
+        return HttpResponseRedirect(package.get_absolute_url())
     elif 'reply_to' in request.POST:
-        return render_to_response('aur/comment_form.html', {'user': request.user,
-            'package_id': object_id, 'reply_to': request.POST['reply_to']})
+        return render_to_response('aur/comment_form.html', {
+            'user': request.user,
+            'package_id': object_id,
+            'reply_to': request.POST['reply_to'],
+        })
     else:
         return HttpResponseRedirect(
-                reverse('django.views.generic.list_detail.object_detail',
-                args=[object_id,]))
+                reverse('aur-package_detail', args=[object_id,]))
 
 def flag_out_of_date(request, object_id):
     package = get_object_or_404(Package, name=object_id)
     package.outdated = True
     package.save()
-    return HttpResponseRedirect(reverse('package-detail', args=[object_id,]))
+    raise Exception(package.outdated)
+    return HttpResponseRedirect(reverse('aur-package_detail',
+        args=[object_id,]))
