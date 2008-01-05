@@ -12,7 +12,6 @@ from django.db import transaction
 
 from archlinux.aur.models import *
 import archlinux.aur.Package as PKGBUILD
-import datetime
 
 def search(request, query = ''):
     if request.method == 'GET' and request.GET.has_key('query'):
@@ -99,9 +98,6 @@ def submit(request):
             else:
                 package.depends.add(dep)
 
-        package.updated = datetime.datetime.now()
-        package.added = datetime.datetime.now()
-
         # Save the package so we can reference it
         package.save()
         package.maintainers.add(request.user)
@@ -149,8 +145,7 @@ def submit(request):
 
         comment = Comment(package=package, user=request.user,
                 message=form.cleaned_data['comment'],
-                ip=request.META['REMOTE_ADDR'], commit=True,
-                added=datetime.datetime.now())
+                ip=request.META['REMOTE_ADDR'], commit=True,)
         comment.save()
         return HttpResponseRedirect(
                 reverse('aur-package_detail', args=[package.name,]))
@@ -166,7 +161,7 @@ def comment(request, object_id):
     if request.POST and 'message' in request.POST:
         package = get_object_or_404(Package, name=object_id)
         comment = Comment(package=package, user=request.user,
-                message=request.POST['message'], added=datetime.datetime.now(),
+                message=request.POST['message'],
                 ip=request.META['REMOTE_ADDR'])
         if 'reply_to' in request.POST:
             comment.parent=request.POST['reply_to']
@@ -186,6 +181,5 @@ def flag_out_of_date(request, object_id):
     package = get_object_or_404(Package, name=object_id)
     package.outdated = True
     package.save()
-    raise Exception(package.outdated)
     return HttpResponseRedirect(reverse('aur-package_detail',
         args=[object_id,]))

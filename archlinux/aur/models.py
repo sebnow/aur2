@@ -7,7 +7,7 @@ from django.dispatch import dispatcher
 
 from django.template.loader import render_to_string
 
-import datetime
+from datetime import datetime
 
 class Category(models.Model):
     name = models.CharField(max_length=20)
@@ -88,7 +88,7 @@ class Package(models.Model):
             related_name="reverse_conflicts", symmetrical=False)
     deleted = models.BooleanField(default=False)
     outdated = models.BooleanField(default=False)
-    added = models.DateTimeField()
+    added = models.DateTimeField(editable=False, default=datetime.now())
     updated = models.DateTimeField()
     groups = models.ManyToManyField(Group, null=True, blank=True)
 
@@ -104,7 +104,7 @@ class Package(models.Model):
     get_absolute_url = permalink(get_absolute_url)
 
     def save(self):
-        self.updated = datetime.datetime.now()
+        self.updated = datetime.now()
         super(Package, self).save()
 
     class Admin:
@@ -146,7 +146,7 @@ class Comment(models.Model):
     parent = models.ForeignKey('self', null=True, blank=True)
     user = models.ForeignKey(User)
     message = models.TextField()
-    added = models.DateTimeField()
+    added = models.DateTimeField(editable=False, default=datetime.now())
     ip = models.IPAddressField()
     hidden = models.BooleanField(default=False)
     commit = models.BooleanField(default=False)
