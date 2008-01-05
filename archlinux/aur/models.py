@@ -105,7 +105,6 @@ class Package(models.Model):
 
     def save(self):
         self.updated = datetime.datetime.now()
-        self.outdated = False
         super(Package, self).save()
 
     class Admin:
