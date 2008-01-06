@@ -133,11 +133,12 @@ def submit(request):
 
         # Hash and save PKGBUILD
         fp = open(pkgbuild, "r")
-        md5hash = hashlib.md5(''.join(fp.readlines()))
+        pkgbuild_contents = ''.join(fp.readlines().append(''))
+        md5hash = hashlib.md5(pkgbuild_contents)
         source = PackageFile(package=package, filename='%s/sources/PKGBUILD'
                 % package.name)
         source.save_filename_file('%s/sources/PKGBUILD' % package.name,
-                ''.join(fp.readlines()))
+                pkgbuild_contents)
         source.save()
         hash = PackageHash(hash=md5hash.hexdigest(), file=source, type='md5')
         hash.save()
