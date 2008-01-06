@@ -1,6 +1,8 @@
 from re import sub
 import os
 import sys
+import tarfile
+import hashlib
 
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
@@ -74,7 +76,7 @@ def submit(request):
                 'user': request.user, 'form': form, 'errors': pkg.get_errors(),
                 'warnings': pkg.get_warnings()})
 
-        # Check if we are updating an existing package or creating one
+        # TODO: Check if we are updating an existing package or creating one
 
         package = Package(name=pkg['name'], version=pkg['version'],
                 release=pkg['release'], description=pkg['description'],
@@ -117,6 +119,29 @@ def submit(request):
             else:
                 package.architectures.add(object)
 
+        # Check if the uploaded file is a tar file or just a PKGBUILD
+        try:
+            tar = tarfile.open(filename, "r")
+        except tarfile.ReadError:
+            # It's not a tar file, so if must be a PKGBUILD since it validated
+            pkgbuild = filename
+            pass
+        else:
+            tmpdir_sources = os.path.join(directory, 'sources')
+            tar.extractall(tmpdir_sources)
+            pkgbuild = os.path.join(tmpdir_sources, 'PKGBUILD')
+
+        # Hash and save PKGBUILD
+        fp = open(pkgbuild, "r")
+        md5hash = hashlib.md5(''.join(fp.readlines()))
+        source = PackageFile(package=package, filename='%s/sources/PKGBUILD'
+                % package.name)
+        source.save_filename_file('%s/sources/PKGBUILD' % package.name,
+                ''.join(fp.readlines()))
+        source.save()
+        hash = PackageHash(hash=md5hash.hexdigest(), file=source, type='md5')
+        hash.save()
+
         for index in range(len(pkg['source'])):
             source = PackageFile(package=package,
                     filename=pkg['source'][index])
@@ -124,23 +149,23 @@ def submit(request):
             # Check for any hashes this file may have
             if pkg['md5sums']:
                 hash = PackageHash(hash=pkg['md5sums'][index], file=source,
-                        type='md5sum')
+                        type='md5')
                 hash.save()
             if pkg['sha1sums']:
                 hash = PackageHash(hash=pkg['sha1sums'][index], file=source,
-                        type='sha1sum')
+                        type='sha1')
                 hash.save()
             if pkg['sha256sums']:
                 hash = PackageHash(hash=pkg['sha256sums'][index], file=source,
-                        type='sha256sum')
+                        type='sha256')
                 hash.save()
             if pkg['sha384sums']:
                 hash = PackageHash(hash=pkg['sha384sums'][index], file=source,
-                        type='sha384sum')
+                        type='sha384')
                 hash.save()
             if pkg['sha512sums']:
                 hash = PackageHash(hash=pkg['sha512sums'][index], file=source,
-                        type='sha512sum')
+                        type='sha512')
                 hash.save()
 
         comment = Comment(package=package, user=request.user,

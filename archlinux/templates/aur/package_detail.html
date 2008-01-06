@@ -63,7 +63,7 @@
                     <ul style="font-size:small;list-style:none">
                     {% ifnotequal pkg.packagefile_set.all.count 0 %}
                         {% for source in pkg.packagefile_set.all %}
-                        <li>{{ source.filename|urlize }}</li>
+                        <li><a href="{{ source.get_absolute_url }}">{{ source.get_filename }}</a></li>
                         {% endfor %}
                     {% else %}
                         <li>{% trans "None" %}</li>
