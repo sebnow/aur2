@@ -8,6 +8,7 @@ from django.dispatch import dispatcher
 from django.template.loader import render_to_string
 
 from datetime import datetime
+import os
 
 class Category(models.Model):
     name = models.CharField(max_length=20)
@@ -117,7 +118,28 @@ class Package(models.Model):
 
 class PackageFile(models.Model):
     package = models.ForeignKey(Package)
-    filename = models.CharField(max_length=100)
+    # filename for local sources and url for external
+    filename = models.FileField(upload_to='packages/', null=True, blank=True)
+    url = models.URLField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        if self.filename:
+            return self.get_filename_url()
+        else:
+            return self.url
+
+    def get_filename(self):
+        if self.filename:
+            return os.path.basename(self.get_filename_filename())
+        else:
+            return self.url
+
+    def _save_FIELD_file(self, field, filename, raw_contents, save=True):
+        old_upload_to=field.upload_to
+        field.upload_to = os.path.join(field.upload_to, os.path.dirname(filename))
+        super(PackageFile, self)._save_FIELD_file(field, filename,
+                raw_contents, save)
+        field.upload_to = old_upload_to
 
     def __unicode__(self):
         return self.filename
