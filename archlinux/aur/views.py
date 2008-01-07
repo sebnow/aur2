@@ -166,11 +166,10 @@ def submit(request):
             source_filename = pkg['source'][index]
             source = PackageFile(package=package)
             # If it's a local file, save to disk, otherwise record as url
-            if is_tarfile:
-                source_path = os.path.join(tmpdir_sources, package.name,
-                        source_filename)
-                if os.path.exists(source_path):
-                    fp = open(source_path, "r")
+            if is_tarfile and os.path.exists(os.path.join(tmpdir_sources,
+               package.name, source_filename)):
+                    fp = open(os.path.join(tmpdir_sources, package.name,
+                        source_filename), "r")
                     source.save_filename_file('%s/sources/%s' % (package.name,
                         source_filename), ''.join(fp.readlines()))
                     fp.close()
