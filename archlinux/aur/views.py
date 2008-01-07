@@ -29,7 +29,7 @@ def search(request, query = ''):
     # Execute the search
     results = form.search()
     # If we only got one hit, just go to the package's detail page
-    if results.count() == 1:
+    if form.is_bound and results.count() == 1:
         return HttpResponseRedirect(reverse('aur-package_detail',
             args=[results[0].name,]))
     # Replace the current page with the new one if it's already in GET
