@@ -123,9 +123,11 @@ def submit(request):
             tar = tarfile.open(filename, "r")
         except tarfile.ReadError:
             # It's not a tar file, so if must be a PKGBUILD since it validated
+            is_tarfile = False
             pkgbuild = filename
             pass
         else:
+            is_tarfile = True
             tmpdir_sources = os.path.join(directory, 'sources')
             tar.extractall(tmpdir_sources)
             pkgbuild = os.path.join(tmpdir_sources, package.name, 'PKGBUILD')
@@ -146,22 +148,30 @@ def submit(request):
         # Save tarball
         # TODO: Tar the saved sources instead of using the uploaded one, for
         # security
+        if not is_tarfile:
+            # We only have to PKGBUILD, so lets make a tarball
+            tar = tarfile.open(os.path.join(directory,
+                '%s.tar.gz' % package.name), "w|gz")
+            tar.add(filename, '%s/PKGBUILD' % package.name)
+            tar.close()
+            filename = os.path.join(directory, '%s.tar.gz' % package.name)
         fp = open(filename, "rb")
-        package.save_tarball_file('%s/%s' % (package.name, os.path.basename(filename)),
-                ''.join(fp.readlines()))
+        package.save_tarball_file('%s/%s' % (package.name,
+            os.path.basename(filename)), ''.join(fp.readlines()))
         fp.close()
 
         for index in range(len(pkg['source'])):
             source_filename = pkg['source'][index]
             source = PackageFile(package=package)
-            source_path = os.path.join(tmpdir_sources, package.name,
-                    source_filename)
             # If it's a local file, save to disk, otherwise record as url
-            if os.path.exists(source_path):
-                fp = open(source_path, "r")
-                source.save_filename_file('%s/sources/%s' % (package.name,
-                    source_filename), ''.join(fp.readlines()))
-                fp.close()
+            if is_tarfile:
+                source_path = os.path.join(tmpdir_sources, package.name,
+                        source_filename)
+                if os.path.exists(source_path):
+                    fp = open(source_path, "r")
+                    source.save_filename_file('%s/sources/%s' % (package.name,
+                        source_filename), ''.join(fp.readlines()))
+                    fp.close()
             else:
                 # TODO: Check that it _is_ a url, otherwise report an error
                 # that files are missing
