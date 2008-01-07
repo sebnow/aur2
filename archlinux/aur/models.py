@@ -199,7 +199,8 @@ class PackageNotification(models.Model):
     package = models.ForeignKey(Package)
 
     def __unicode__(self):
-        return "%s subscription to %s updates" % (self.user.username, self.package.name)
+        return "%s's subscription to %s updates" % (self.user.username,
+                self.package.name)
 
     class Admin:
         pass

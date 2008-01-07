@@ -211,5 +211,16 @@ def flag_out_of_date(request, object_id):
     package = get_object_or_404(Package, name=object_id)
     package.outdated = True
     package.save()
+    return HttpResponseRedirect(package.get_absolute_url())
+
+def notify_of_updates(request, object_id):
+    """Subscribe a user to package updates"""
+    package = get_object_or_404(Package, name=object_id)
+    PackageNotification(package=package, user=request.user).save()
+    return HttpResponseRedirect(package.get_absolute_url())
+
+def denotify_of_updates(request, object_id):
+    """Unsubscribe a user from package updates"""
+    PackageNotification.objects.get(package__name=object_id, user=request.user).delete()
     return HttpResponseRedirect(reverse('aur-package_detail',
         args=[object_id,]))
