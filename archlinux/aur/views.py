@@ -50,6 +50,7 @@ def search(request, query = ''):
 
 # TODO: Implement transactions
 @login_required
+@transaction.commit_manually
 def submit(request):
     if request.method == 'POST':
         form = PackageSubmitForm(request.POST, request.FILES)
@@ -110,6 +111,7 @@ def submit(request):
                 object = Architecture.objects.get(name=arch)
             except Architecture.DoesNotExist:
                 # TODO: Add an error
+                transaction.rollback()
                 return render_to_response('aur/submit.html', {
                     'user': request.user,
                     'form': form,
@@ -187,6 +189,7 @@ def submit(request):
                 message=form.cleaned_data['comment'],
                 ip=request.META['REMOTE_ADDR'], commit=True,)
         comment.save()
+        transaction.commit()
         return HttpResponseRedirect(
                 reverse('aur-package_detail', args=[package.name,]))
     else:
