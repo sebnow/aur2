@@ -40,6 +40,9 @@
         </tr><tr>
             <th>{% trans "Last Updated" %}:</th>
             <td>{{ pkg.updated|date:"Y-m-d H:i:s" }}</td>
+        </tr><tr>
+            <th>{% trans "Download" %}</th>
+            <td><a href="{{ pkg.get_tarball_url }}">{{ pkg.get_tarball_basename }}</a></td>
         </tr>
     </table>
     <br />

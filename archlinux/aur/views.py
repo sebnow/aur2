@@ -143,6 +143,14 @@ def submit(request):
         hash.save()
         del pkgbuild_contents
 
+        # Save tarball
+        # TODO: Tar the saved sources instead of using the uploaded one, for
+        # security
+        fp = open(filename, "rb")
+        package.save_tarball_file('%s/%s' % (package.name, os.path.basename(filename)),
+                ''.join(fp.readlines()))
+        fp.close()
+
         for index in range(len(pkg['source'])):
             source_filename = pkg['source'][index]
             source = PackageFile(package=package)
