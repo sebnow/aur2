@@ -75,6 +75,7 @@ class Package(models.Model):
     maintainers = models.ManyToManyField(User)
     repository = models.ForeignKey(Repository)
     category = models.ForeignKey(Category)
+    tarball = models.FileField(upload_to='packages')
     licenses = models.ManyToManyField(License, null=True, blank=True)
     architectures = models.ManyToManyField(Architecture)
     depends = models.ManyToManyField('self', null=True, blank=True,
@@ -100,6 +101,10 @@ class Package(models.Model):
         return ', '.join(map(str, self.architectures.all()))
     get_arch.short_description = 'architectures'
 
+    def get_tarball_basename(self):
+        """Return the basename of the absolute path to the tarball"""
+        return os.path.basename(self.get_tarball_filename())
+
     def get_absolute_url(self):
         return ('aur-package_detail', [self.name,])
     get_absolute_url = permalink(get_absolute_url)
@@ -107,6 +112,14 @@ class Package(models.Model):
     def save(self):
         self.updated = datetime.now()
         super(Package, self).save()
+
+    def _save_FIELD_file(self, field, filename, raw_contents, save=True):
+        old_upload_to=field.upload_to
+        dirname, filename = filename.rsplit(os.path.sep, 1)
+        field.upload_to = os.path.join(field.upload_to, dirname)
+        super(Package, self)._save_FIELD_file(field, filename,
+                raw_contents, save)
+        field.upload_to = old_upload_to
 
     class Admin:
         list_display = ('name', 'category', 'get_arch', 'updated')
