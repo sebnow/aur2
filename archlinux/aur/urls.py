@@ -14,6 +14,10 @@ urlpatterns = patterns('archlinux.aur.views',
         name='aur-comment_on_package'),
     url(r'^package/(?P<object_id>[\w_-]+)/flag_out_of_date/$',
         'flag_out_of_date', name='aur-flag_out_of_date'),
+    url(r'^package/(?P<object_id>[\w_-]+)/notify_of_updates/$',
+        'notify_of_updates', name='aur-notify_of_updates'),
+    url(r'^package/(?P<object_id>[\w_-]+)/denotify_of_updates/$',
+        'denotify_of_updates', name='aur-denotify_of_updates'),
 )
 
 # Generic views
