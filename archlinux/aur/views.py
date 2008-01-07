@@ -81,9 +81,10 @@ def submit(request):
         package = Package(name=pkg['name'], version=pkg['version'],
                 release=pkg['release'], description=pkg['description'],
                 url=pkg['url'])
-
         package.repository=Repository.objects.get(name__exact="Unsupported")
         package.category=Category.objects.get(name__iexact=form.cleaned_data['category'])
+        # Save the package so we can reference it
+        package.save()
 
         # Check for, and add dependencies
         for dependency in pkg['depends']:
@@ -100,8 +101,6 @@ def submit(request):
             else:
                 package.depends.add(dep)
 
-        # Save the package so we can reference it
-        package.save()
         package.maintainers.add(request.user)
         for license in pkg['licenses']:
             object, created = License.objects.get_or_create(name=license)
@@ -129,45 +128,42 @@ def submit(request):
         else:
             tmpdir_sources = os.path.join(directory, 'sources')
             tar.extractall(tmpdir_sources)
-            pkgbuild = os.path.join(tmpdir_sources, 'PKGBUILD')
+            pkgbuild = os.path.join(tmpdir_sources, package.name, 'PKGBUILD')
 
         # Hash and save PKGBUILD
         fp = open(pkgbuild, "r")
-        pkgbuild_contents = ''.join(fp.readlines().append(''))
-        md5hash = hashlib.md5(pkgbuild_contents)
-        source = PackageFile(package=package, filename='%s/sources/PKGBUILD'
-                % package.name)
+        pkgbuild_contents = ''.join(fp.readlines())
+        fp.close()
+        source = PackageFile(package=package)
         source.save_filename_file('%s/sources/PKGBUILD' % package.name,
                 pkgbuild_contents)
         source.save()
+        md5hash = hashlib.md5(pkgbuild_contents)
         hash = PackageHash(hash=md5hash.hexdigest(), file=source, type='md5')
         hash.save()
+        del pkgbuild_contents
 
         for index in range(len(pkg['source'])):
-            source = PackageFile(package=package,
-                    filename=pkg['source'][index])
+            source_filename = pkg['source'][index]
+            source = PackageFile(package=package)
+            source_path = os.path.join(tmpdir_sources, package.name,
+                    source_filename)
+            # If it's a local file, save to disk, otherwise record as url
+            if os.path.exists(source_path):
+                fp = open(source_path, "r")
+                source.save_filename_file('%s/sources/%s' % (package.name,
+                    source_filename), ''.join(fp.readlines()))
+                fp.close()
+            else:
+                # TODO: Check that it _is_ a url, otherwise report an error
+                # that files are missing
+                source.url = source_filename
             source.save()
-            # Check for any hashes this file may have
-            if pkg['md5sums']:
-                hash = PackageHash(hash=pkg['md5sums'][index], file=source,
-                        type='md5')
-                hash.save()
-            if pkg['sha1sums']:
-                hash = PackageHash(hash=pkg['sha1sums'][index], file=source,
-                        type='sha1')
-                hash.save()
-            if pkg['sha256sums']:
-                hash = PackageHash(hash=pkg['sha256sums'][index], file=source,
-                        type='sha256')
-                hash.save()
-            if pkg['sha384sums']:
-                hash = PackageHash(hash=pkg['sha384sums'][index], file=source,
-                        type='sha384')
-                hash.save()
-            if pkg['sha512sums']:
-                hash = PackageHash(hash=pkg['sha512sums'][index], file=source,
-                        type='sha512')
-                hash.save()
+            # Check for, and save, any hashes this file may have
+            for hash_type in ('md5', 'sha1', 'sha256', 'sha384', 'sha512'):
+                if pkg[hash_type + 'sums']:
+                    PackageHash(hash=pkg[hash_type + 'sums'][index],
+                            file=source, type=hash_type).save()
 
         comment = Comment(package=package, user=request.user,
                 message=form.cleaned_data['comment'],

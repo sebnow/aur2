@@ -119,7 +119,7 @@ class Package(models.Model):
 class PackageFile(models.Model):
     package = models.ForeignKey(Package)
     # filename for local sources and url for external
-    filename = models.FileField(upload_to='packages/', null=True, blank=True)
+    filename = models.FileField(upload_to='packages', null=True, blank=True)
     url = models.URLField(null=True, blank=True)
 
     def get_absolute_url(self):
@@ -136,7 +136,8 @@ class PackageFile(models.Model):
 
     def _save_FIELD_file(self, field, filename, raw_contents, save=True):
         old_upload_to=field.upload_to
-        field.upload_to = os.path.join(field.upload_to, os.path.dirname(filename))
+        dirname, filename = filename.rsplit(os.path.sep, 1)
+        field.upload_to = os.path.join(field.upload_to, dirname)
         super(PackageFile, self)._save_FIELD_file(field, filename,
                 raw_contents, save)
         field.upload_to = old_upload_to
