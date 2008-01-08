@@ -86,6 +86,10 @@ class Package(UserDict):
             self._errors.append('package name must be alphanumeric')
         elif not re.compile("[a-z\d_-]+").match(self['name']):
             self._warnings.append('package name should be in lower case')
+        if self['version'].find('-') >= 0:
+            self._errors.append('version field is not allowed to contain hyphens')
+        if str(self['release']).find('-') >= 0:
+            self._errors.append('release field is not allowed to contain hyphens')
         # Description isn't supposed to be longer than 80 characters
         if self['description'] and len(self['description']) > 80:
             self._warnings.append('description should not exceed 80 characters')
