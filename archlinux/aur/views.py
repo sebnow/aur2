@@ -184,6 +184,25 @@ def submit(request):
                     PackageHash(hash=pkg[hash_type + 'sums'][index],
                             file=source, type=hash_type).save()
 
+        for install_file in pkg['install']:
+            source_path = os.path.join(tmpdir_sources, package.name,
+                    install_file)
+            if not os.path.exists(source_path):
+                self._errors.append()
+                transaction.rollback()
+                return render_to_response('aur/submit.html', {
+                    'user': request.user,
+                    'form': form,
+                    'errors': 'install file "%s" does not exist' % install_file
+                })
+
+            source = PackageFile(package=package)
+            fp = open(source_path, "r")
+            source.save_filename_file('%s/install/%s' % (package.name,
+                    install_file), ''.join(fp.readlines()))
+            fp.close()
+            source.save()
+
         comment = Comment(package=package, user=request.user,
                 message=form.cleaned_data['comment'],
                 ip=request.META['REMOTE_ADDR'], commit=True,)
