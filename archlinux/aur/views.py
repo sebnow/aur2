@@ -11,6 +11,7 @@ from django import newforms as forms # This will change to forms in 0.68 or 1.0
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db import transaction
+from django.core import serializers
 
 from archlinux.aur.models import *
 import archlinux.aur.Package as PKGBUILD
@@ -255,3 +256,26 @@ def denotify_of_updates(request, object_id):
     PackageNotification.objects.get(package__name=object_id, user=request.user).delete()
     return HttpResponseRedirect(reverse('aur-package_detail',
         args=[object_id,]))
+
+def api_search(request, query):
+    results = Package.objects.filter(name__icontains=query)
+    data = serializers.serialize('json', results,
+            fields=(
+                'name',
+                'version',
+                'respository__name',
+                'description'
+            )
+    )
+    return HttpResponse(data, mimetype="text/plain")
+
+def api_package_info(request, object_id):
+    package = get_object_or_404(Package, name=object_id)
+    data = serializers.serialize('json', [package,])
+    return HttpResponse(data, mimetype="text/plain")
+
+def api_package_comments(request, object_id):
+    comments = Comment.objects.filter(package=object_id)
+    data = serializers.serialize('json', comments)
+    return HttpResponse(data, mimetype="text/plain")
+

@@ -18,6 +18,9 @@ urlpatterns = patterns('archlinux.aur.views',
         'notify_of_updates', name='aur-notify_of_updates'),
     url(r'^package/(?P<object_id>[\w_-]+)/denotify_of_updates/$',
         'denotify_of_updates', name='aur-denotify_of_updates'),
+    (r'^api/search/(?P<query>[\w\d_ -]+)/$', 'api_search'),
+    (r'^api/get_package_info/(?P<object_id>[\w_-]+)/$', 'api_package_info'),
+    (r'^api/get_package_comments/(?P<object_id>[\w_-]+)/$', 'api_package_comments'),
 )
 
 # Generic views
