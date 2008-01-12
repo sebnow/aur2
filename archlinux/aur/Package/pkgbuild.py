@@ -73,8 +73,12 @@ class Package(UserDict):
 
         # Remove the temporary file since we don't need it
         if is_temporary:
-            os.remove(file)
-            #os.removedirs(directory)
+            for root, dirs, files in os.walk(directory, topdown=False):
+                for name in files:
+                    os.remove(os.path.join(root, name))
+                for name in dirs:
+                    os.rmdir(os.path.join(root, name))
+            os.rmdir(directory)
 
     def validate(self):
         """Validate PKGBUILD for missing or invalid fields"""
