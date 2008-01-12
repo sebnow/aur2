@@ -4,24 +4,24 @@
     <head>
         <title>Arch Linux AUR{% block extra_title %}{% endblock %}</title>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <link rel="stylesheet" href="http://www.archlinux.org/media/arch.css" />
+        <link rel="stylesheet" type="text/css" href="http://www.archlinux.org/media/arch.css" />
+        <link rel="stylesheet" type="text/css" href="/media/css/aur.css" />
         <link rel="icon" href="http://www.archlinux.org/media/favicon.ico" type="image/x-icon" />
         <link rel="shortcut icon" href="http://www.archlinux.org/media/favicon.ico" type="image/x-icon" />
         {% block extra_head %}
         {% endblock %}
     </head>
     <body>
+        <div id="login-or-register">
+        {% if user.is_authenticated %}
+            {% trans "Logged in as" %} <strong>{{ user.username }}</strong>. <a href="{% url account-logout %}">Logout</a>
+        {% else %}
+            <a href="{% url account-login %}">{% trans "Login" %}</a> {% trans "or" %} <a href="{% url account-register %}">{% trans "register" %}</a>
+        {% endif %}
+        </div>
         <div id="head_container">
             <div id="title">
-                <div id="logo"><a href="/"><img src="http://www.archlinux.org/media/logo.png" alt="Arch Logo" /></a></div>
-                <div id="titleimg"><a href="/"><img src="http://www.archlinux.org/media/title.png" alt="Arch Linux" /></a></div>
-            </div>
-            <div style="float: right; color: #eeeeee; font-size: small">
-            {% if user.is_authenticated %}
-                {% trans "Logged in as" %} <strong>{{ user.username }}</strong>. <a href="{% url account-logout %}">Logout</a>
-            {% else %}
-                <a href="{% url account-login %}">{% trans "Login" %}</a> {% trans "or" %} <a href="{% url account-register %}">{% trans "register" %}</a>
-            {% endif %}
+                <div id="logo"><h1 id="archtitle"><a href="/" title="Arch Linux (Home)">Arch Linux</a></h1></div>
             </div>
             <div id="main_nav">
                 {% block topmenu %}
@@ -69,8 +69,8 @@
         </div>
         <div class="foot">
             <p>For more information please read the <a href="http://wiki.archlinux.org/index.php/AUR_User_Guidelines">AUR User Guidelines</a>.</p>
-            Copyright &copy; 2002-2007, Judd Vinet &lt;<a href="mailto:jvinet@zeroflux.org">jvinet@zeroflux.org</a>&gt;<br /><br />
-            <img src="http://www.archlinux.org/logos/button.png" alt="Arch Linux" />
+            Copyright &copy; 2002-2008 <a href="mailto:jvinet@zeroflux.org" title="contact Judd Vinet">Judd Vinet</a> and <a href="mailto:aaron@archlinux.org" title="contact Aaron Griffin">Aaron Griffin</a>.<br />
+            The Arch Linux name and logo are recognized trademarks. Some rights reserved.
         </div>
     </body>
 </html>
