@@ -80,6 +80,7 @@
         </tr>
     </table>
 </div>
+{% ifnotequal pkg.comment_set.count 0 %}
 <br />
 <h2 class="title">{% trans "Comments" %}</h2>
 <div class="greybox">
@@ -98,6 +99,7 @@
     {% if not forloop.last %}<br />{% endif %}
     {% endfor %}
 </div>
+{% endifnotequal %}
 <br />
 <h2 class="title">{% trans "Post comment" %}</h2>
 <div class="greybox" style="text-align:right">

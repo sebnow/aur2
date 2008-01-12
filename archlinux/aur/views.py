@@ -204,10 +204,6 @@ def submit(request):
             fp.close()
             source.save()
 
-        comment = Comment(package=package, user=request.user,
-                message=form.cleaned_data['comment'],
-                ip=request.META['REMOTE_ADDR'], commit=True,)
-        comment.save()
         transaction.commit()
         return HttpResponseRedirect(
                 reverse('aur-package_detail', args=[package.name,]))
