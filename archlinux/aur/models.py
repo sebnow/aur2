@@ -1,14 +1,18 @@
 from django.db import models
+from django.db import transaction
 from django.contrib.admin.models import User
 from django import newforms as forms # This will change to forms in 0.98 or 1.0
 from django.core.mail import send_mass_mail
 from django.db.models import signals, permalink
 from django.dispatch import dispatcher
-
+from django.utils.translation import ugettext
 from django.template.loader import render_to_string
 
 from datetime import datetime
 import os
+import sys
+
+import archlinux.aur.Package as PKGBUILD
 
 class Category(models.Model):
     name = models.CharField(max_length=20)
@@ -279,15 +283,185 @@ class PackageSearchForm(forms.Form):
             results = results.order_by(sortby, 'repository', 'category', 'name')
         return results
 
+class PackageField(forms.FileField):
+    widget = forms.widgets.FileInput
+    def __init__(self, *args, **kwargs):
+        super(forms.FileField, self).__init__(*args, **kwargs)
+
+    def clean(self, data):
+        import tempfile
+        import tarfile
+        try:
+            file = super(PackageField, self).clean(data)
+        except:
+            raise
+        errors = list()
+        # Save the uploaded file to disk
+        directory = tempfile.mkdtemp()
+        filename = os.path.join(directory, file.filename)
+        fp = open(filename, "wb")
+        fp.write(file.content)
+        fp.close()
+
+        # Try to parse the PKGBUILD
+        try:
+            pkg = PKGBUILD.Package(filename)
+        except:
+            raise forms.ValidationError(sys.exc_info()[1])
+        # Add path of the tarball/PKGBUILD so we can reference in other places
+        pkg['filename'] = filename
+        # Validate PKGBUILD
+        pkg.validate()
+        if not pkg.is_valid() or pkg.has_warnings():
+            errors.extend(pkg.get_errors())
+            errors.extend(pkg.get_warnings())
+        # Check if we have everything we need
+        for arch in pkg['arch']:
+            try:
+                Architecture.objects.get(name=arch)
+            except Architecture.DoesNotExist:
+                errors.append('architecture %s does not exist' % arch)
+        if pkg['install']:
+            try:
+                tar = tarfile.open(filename)
+            except tarfile.ReadError:
+                errors.append('install files are missing')
+            else:
+                files = tar.getnames()
+                for file in pkg['install']:
+                    filepath = os.path.join(pkg['name'], file)
+                    if not filepath in files:
+                        errors.append('install file "%s" is missing' % file)
+                del files
+        # Report errors or return the validated package
+        if errors:
+            raise forms.ValidationError(errors)
+        else:
+            return pkg
+
 class PackageSubmitForm(forms.Form):
+    category = forms.ChoiceField(choices=())
+    package = PackageField(label="PKGBUILD")
+
     # Borrowed from AUR2-BR
     def __init__(self, *args, **kwargs):
         super(PackageSubmitForm, self).__init__(*args, **kwargs)
         category_choices = [(category.name.lower(), category.name) for category in Category.objects.all()]
         self.fields['category'].choices = category_choices
 
-    category = forms.ChoiceField(choices=())
-    file = forms.FileField(label="PKGBUILD")
+    @transaction.commit_manually
+    def save(self, user):
+        import hashlib
+        import tarfile
+        pkg = self.cleaned_data['package']
+        tmpdir = os.path.dirname(pkg['filename'])
+        package = Package(name=pkg['name'],
+                version=pkg['version'],
+                release=pkg['release'],
+                description=pkg['description'],
+                url=pkg['url'])
+        package.repository=Repository.objects.get(name="Unsupported")
+        package.category=Category.objects.get(name=self.cleaned_data['category'])
+        # Save the package so we can reference it
+        package.save()
+        package.maintainers.add(user)
+        # Check for, and add dependencies
+        for dependency in pkg['depends']:
+            # This would be nice, but we don't have access to the official
+            # repositories
+            try:
+                dep = Package.objects.get(name=dependency)
+            except Package.DoesNotExist:
+                # Fail silently
+                pass
+            else:
+                package.depends.add(dep)
+        # Add licenses
+        for license in pkg['licenses']:
+            object, created = License.objects.get_or_create(name=license)
+            package.licenses.add(object)
+        # Add architectures
+        for arch in pkg['arch']:
+            object = Architecture.objects.get(name=arch)
+            package.architectures.add(object)
+        # Check if the uploaded file is a tar file or just a PKGBUILD
+        try:
+            tar = tarfile.open(pkg['filename'], "r")
+        except tarfile.ReadError:
+            # It's not a tar file, so if must be a PKGBUILD since it validated
+            is_tarfile = False
+            pkgbuild = pkg['filename']
+        else:
+            is_tarfile = True
+            tmpdir_sources = os.path.join(tmpdir, 'sources')
+            tar.extractall(tmpdir_sources)
+            pkgbuild = os.path.join(tmpdir_sources, pkg['name'], 'PKGBUILD')
+        # Hash and save PKGBUILD
+        fp = open(pkgbuild, "r")
+        pkgbuild_contents = ''.join(fp.readlines())
+        fp.close()
+        source = PackageFile(package=package)
+        source.save_filename_file('%s/sources/PKGBUILD' % pkg['name'],
+                pkgbuild_contents)
+        source.save()
+        md5hash = hashlib.md5(pkgbuild_contents)
+        hash = PackageHash(hash=md5hash.hexdigest(), file=source, type='md5')
+        hash.save()
+        del pkgbuild_contents
+        # Save tarball
+        # TODO: Tar the saved sources instead of using the uploaded one, for
+        # security
+        if not is_tarfile:
+            # We only have the PKGBUILD, so lets make a tarball
+            tar = tarfile.open(os.path.join(tmpdir, '%s.tar.gz' % pkg['name']),
+                    "w|gz")
+            tar.add(pkg['filename'], '%s/PKGBUILD' % pkg['name'])
+            tar.close()
+            pkg['filename'] = os.path.join(tmpdir, '%s.tar.gz' % pkg['name'])
+        fp = open(pkg['filename'], "rb")
+        package.save_tarball_file('%s/%s' % (pkg['name'],
+            os.path.basename(pkg['filename'])), ''.join(fp.readlines()))
+        fp.close()
+        # Save source files
+        for index in range(len(pkg['source'])):
+            source_filename = pkg['source'][index]
+            source = PackageFile(package=package)
+            # If it's a local file, save to disk, otherwise record as url
+            if is_tarfile and os.path.exists(os.path.join(tmpdir_sources,
+               package.name, source_filename)):
+                    fp = open(os.path.join(tmpdir_sources, pkg['name'],
+                        source_filename), "r")
+                    source.save_filename_file('%s/sources/%s' % (pkg['name'],
+                        source_filename), ''.join(fp.readlines()))
+                    fp.close()
+            else:
+                # TODO: Check that it _is_ a url, otherwise report an error
+                # that files are missing
+                source.url = source_filename
+            source.save()
+            # Check for, and save, any hashes this file may have
+            for hash_type in ('md5', 'sha1', 'sha256', 'sha384', 'sha512'):
+                if pkg[hash_type + 'sums']:
+                    PackageHash(hash=pkg[hash_type + 'sums'][index],
+                            file=source, type=hash_type).save()
+        # Save install files
+        for file in pkg['install']:
+            source = PackageFile(package=package)
+            source_path = os.path.join(tmpdir_sources, pkg['name'], file)
+            fp = open(source_path, "r")
+            source.save_filename_file('%s/install/%s' % (pkg['name'], file),
+                    ''.join(fp.readlines()))
+            fp.close()
+            source.save()
+        transaction.commit()
+        # Remove temporary files
+        for root, dirs, files in os.walk(tmpdir, topdown=False):
+            for name in files:
+                os.remove(os.path.join(root, name))
+            for name in dirs:
+                os.rmdir(os.path.join(root, name))
+        os.rmdir(tmpdir)
+
 
 # Should this be here?
 def email_package_updates(sender, instance, signal, *args, **kwargs):

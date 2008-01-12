@@ -16,13 +16,16 @@
 </div>
 <br />
 {% endif %}
-<div class="greybox" style="max-width: 700px; margin: auto;">
+<div class="greybox" style="max-width: 800px; margin: auto;">
     <h3>Submit Package</h3>
     <p>Please read the <a href=http://wiki.archlinux.org/index.php/Arch_Packaging_Standards#Submitting_Packages_to_the_AUR">guidelines for submitting packages</a> and run namcap on the PKGBUILD and built package before submitting.</p>
+    {% if not form.is_valid and form.is_bound %}
+    <h4>Errors</h4>
+    {{ form.errors }}
+    {% endif %}
     <form action="." method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
         <div style="text-align:center">
-            {{ form.category }}
-            {{ form.file }}
+            {% for field in form %}{{ field }} {% endfor %}
             <input type="submit" value="{% trans "Upload" %}" />
         </div>
     </form>
