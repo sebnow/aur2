@@ -10,3 +10,7 @@
     color: #FFFFFF;
     font-weight: bold;
 }
+
+ul.errorlist li {
+    color: #DD0000;
+}
