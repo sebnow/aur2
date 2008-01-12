@@ -7,6 +7,7 @@ from django.db.models import signals, permalink
 from django.dispatch import dispatcher
 from django.utils.translation import ugettext
 from django.template.loader import render_to_string
+from django.utils.encoding import smart_unicode
 
 from datetime import datetime
 import os
@@ -99,10 +100,10 @@ class Package(models.Model):
     groups = models.ManyToManyField(Group, null=True, blank=True)
 
     def __unicode__(self):
-        return "%s %s" % (self.name, self.version)
+        return u'%s %s' % (self.name, self.version)
 
     def get_arch(self):
-        return ', '.join(map(str, self.architectures.all()))
+        return ', '.join(map(smart_unicode, self.architectures.all()))
     get_arch.short_description = 'architectures'
 
     def get_tarball_basename(self):
@@ -202,7 +203,7 @@ class PackageNotification(models.Model):
     package = models.ForeignKey(Package)
 
     def __unicode__(self):
-        return "%s's subscription to %s updates" % (self.user.username,
+        return u"%s's subscription to %s updates" % (self.user.username,
                 self.package.name)
 
     class Admin:
