@@ -479,8 +479,32 @@ def email_package_updates(sender, instance, signal, *args, **kwargs):
             (notification.user.email,)))
     return send_mass_mail(mail_list)
 
+
+def remove_packagefile_filename(sender, instance, signal, *args, **kwargs):
+    """Remove PackageFile's file"""
+    if instance.filename:
+        os.remove(instance.get_filename_filename())
+        try:
+            os.rmdir(os.path.dirname(instance.get_filename_filename()))
+        except:
+            pass
+
+
+def remove_package_tarball(sender, instance, signal, *args, **kwargs):
+    """Remove Package's tarball"""
+    os.remove(instance.get_tarball_filename())
+    os.rmdir(os.path.dirname(instance.get_tarball_filename()))
+
+
 # Send notifications of updates to users on saves and deltion of packages
 dispatcher.connect(email_package_updates, signal=signals.post_save,
         sender=Package)
 dispatcher.connect(email_package_updates, signal=signals.post_delete,
+        sender=Package)
+# Remove files when packages get deleted
+# Django doesn't call each instance's delete() on cascade, but it does send
+# pre_delete signals
+dispatcher.connect(remove_packagefile_filename, signal=signals.pre_delete,
+        sender=PackageFile)
+dispatcher.connect(remove_package_tarball, signal=signals.pre_delete,
         sender=Package)
