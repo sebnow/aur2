@@ -1,0 +1,12 @@
+#login-or-register {
+    position: absolute;
+    left: 30px;
+    top: 128px;
+    color: #ffffff;
+    font-size: 13px;
+}
+
+#login-or-register a {
+    color: #FFFFFF;
+    font-weight: bold;
+}
