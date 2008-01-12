@@ -185,7 +185,6 @@ class Comment(models.Model):
     added = models.DateTimeField(editable=False, default=datetime.now())
     ip = models.IPAddressField()
     hidden = models.BooleanField(default=False)
-    commit = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.message
@@ -289,7 +288,6 @@ class PackageSubmitForm(forms.Form):
 
     category = forms.ChoiceField(choices=())
     file = forms.FileField(label="PKGBUILD")
-    comment = forms.CharField(widget=forms.Textarea, label="Commit Message")
 
 # Should this be here?
 def email_package_updates(sender, instance, signal, *args, **kwargs):
