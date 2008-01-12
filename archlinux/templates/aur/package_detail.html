@@ -17,7 +17,7 @@
             {% if pkg.outdated %}
                 <em>{% trans "This package has been flagged out-of-date" %}</em>
             {% else %}
-                <a href="{% url aur-flag_out_of_date object_id=pkg.name %}">{% trans "Flag Package Out-of-Date" %}</a>
+            <a href="{% url aur-flag_out_of_date object_id=pkg.name %}">{% trans "Flag Package Out-of-Date" %}</a> <a target="_blank" href="http://www.archlinux.org/packages/flaghelp/">(?)</a>
             {% endif %}
             </li>
         </ul>
