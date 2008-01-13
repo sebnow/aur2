@@ -118,6 +118,11 @@ class Package(models.Model):
         self.updated = datetime.now()
         super(Package, self).save()
 
+    def delete_tarball(self):
+        """Remove Package's tarball"""
+        os.remove(self.get_tarball_filename())
+        os.rmdir(os.path.dirname(self.get_tarball_filename()))
+
     def _save_FIELD_file(self, field, filename, raw_contents, save=True):
         old_upload_to=field.upload_to
         dirname, filename = filename.rsplit(os.path.sep, 1)
@@ -356,16 +361,28 @@ class PackageSubmitForm(forms.Form):
         import tarfile
         pkg = self.cleaned_data['package']
         tmpdir = os.path.dirname(pkg['filename'])
-        package = Package(name=pkg['name'],
-                version=pkg['version'],
-                release=pkg['release'],
-                description=pkg['description'],
-                url=pkg['url'])
+        updating = False
+        creating = False
+        try:
+            package = Package.objects.get(name=pkg['name'])
+        except Package.DoesNotExist:
+            package = Package(name=pkg['name'])
+            creating = True
+        else:
+            updating = True
+        package.version=pkg['version']
+        package.release=pkg['release']
+        package.description=pkg['description']
+        package.url=pkg['url']
         package.repository=Repository.objects.get(name="Unsupported")
         package.category=Category.objects.get(name=self.cleaned_data['category'])
         # Save the package so we can reference it
         package.save()
-        package.maintainers.add(user)
+        if creating:
+            package.maintainers.add(user)
+        else:
+            # TODO: Check if user can upload/overwrite the package
+            pass
         # Check for, and add dependencies
         for dependency in pkg['depends']:
             # This would be nice, but we don't have access to the official
@@ -397,6 +414,10 @@ class PackageSubmitForm(forms.Form):
             tmpdir_sources = os.path.join(tmpdir, 'sources')
             tar.extractall(tmpdir_sources)
             pkgbuild = os.path.join(tmpdir_sources, pkg['name'], 'PKGBUILD')
+        # Remove all sources. It's easier and cleaner this way.
+        if updating:
+            PackageFile.objects.filter(package=pkg['name']).delete()
+            package.delete_tarball()
         # Hash and save PKGBUILD
         fp = open(pkgbuild, "r")
         pkgbuild_contents = ''.join(fp.readlines())
@@ -493,9 +514,7 @@ def remove_packagefile_filename(sender, instance, signal, *args, **kwargs):
 
 def remove_package_tarball(sender, instance, signal, *args, **kwargs):
     """Remove Package's tarball"""
-    os.remove(instance.get_tarball_filename())
-    os.rmdir(os.path.dirname(instance.get_tarball_filename()))
-
+    instance.delete_tarball()
 
 # Send notifications of updates to users on saves and deltion of packages
 dispatcher.connect(email_package_updates, signal=signals.post_save,
