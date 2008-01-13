@@ -19,7 +19,7 @@
             <td><a{% if package.outdated %} class="error"{% endif %} href="/package/{{package.name}}/">{{ package.name }} {{ package.version }}-{{ package.release }}</a></td>
             <td>{{ package.description }}</td>
             <td>{{ package.category.name }}</td>
-            <td>{{ package.updated }}</td>
+            <td>{{ package.updated|date:"Y-m-d H:i:s" }}</td>
         </tr>
         {% endfor %}
     </table>
