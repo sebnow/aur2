@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block extra_title %} - {% trans "Error" %} {{ heading }}{% endblock %}
+{% block content %}
+<div class="greybox">
+    <h2>{{ heading }}</h2>
+    {{ error|linebreaks }}
+</div>
+{% endblock %}

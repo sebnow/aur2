@@ -10,6 +10,8 @@ from BetterPaginator import BetterPaginator
 from django import newforms as forms # This will change to forms in 0.68 or 1.0
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.core import serializers
+from django.utils.translation import ugettext
 
 from archlinux.aur.models import *
 from archlinux.aur.forms import PackageSearchForm, PackageSubmitForm
@@ -92,12 +94,14 @@ def flag_out_of_date(request, object_id):
     package.save()
     return HttpResponseRedirect(package.get_absolute_url())
 
+@login_required
 def notify_of_updates(request, object_id):
     """Subscribe a user to package updates"""
     package = get_object_or_404(Package, name=object_id)
     PackageNotification(package=package, user=request.user).save()
     return HttpResponseRedirect(package.get_absolute_url())
 
+@login_required
 def denotify_of_updates(request, object_id):
     """Unsubscribe a user from package updates"""
     PackageNotification.objects.get(package__name=object_id, user=request.user).delete()
@@ -115,6 +119,67 @@ def api_search(request, query):
             )
     )
     return HttpResponse(data, mimetype="text/plain")
+
+@login_required
+def manage_packages(request):
+    if request.method != 'POST':
+        return HttpResponseRedirect(reverse('aur-search'))
+    packages = request.POST.getlist('packages')
+    if request.POST['action'] == 'unflag-ood':
+        for package_name in packages:
+            package = Package.objects.get(name=package_name)
+            if request.user.get_profile().can_modify_package(package):
+                package.outdated = False
+                package.save()
+            else:
+                return render_to_response('aur/error.html', dict(
+                    heading = ugettext("Permission denied"),
+                    error = "You are not allowed to edit %s" % package_name,
+                ))
+    elif request.POST['action'] == 'flag-ood':
+        for package_name in packages:
+            package = Package.objects.get(name=package_name)
+            if request.user.get_profile().can_modify_package(package):
+                package.outdated = True
+                package.save()
+            else:
+                return render_to_response('aur/error.html', dict(
+                    heading = ugettext("Permission denied"),
+                    error = "You are not allowed to edit %s" % package_name,
+                ))
+    elif request.POST['action'] == 'disown':
+        for package_name in packages:
+            package = Package.objects.get(name=package_name)
+            if request.user.get_profile().can_modify_package(package):
+                package.maintainers.clear()
+            else:
+                return render_to_response('aur/error.html', dict(
+                    heading = ugettext("Permission denied"),
+                    error = "You cannot disown %s" % package_name,
+                ))
+    elif request.POST['action'] == 'adopt':
+        for package_name in packages:
+            package = Package.objects.get(name=package_name)
+            if package.maintainers.count() == 0:
+                package.maintainers.add(request.user)
+            elif request.user.get_profile().is_moderator():
+                package.maintainers.add(request.user)
+            else:
+                return render_to_response('aur/error.html', dict(
+                    heading = ugettext("Permission denied"),
+                    error = "You cannot adopt %s" % package_name,
+                ))
+    elif request.POST['action'] == 'delete':
+        for package_name in packages:
+            package = Package.objects.get(name=package_name)
+            if request.user.get_profile().can_delete_package(package):
+                package.delete()
+            else:
+                return render_to_response('aur/error.html', dict(
+                    heading = ugettext("Permission denied"),
+                    error = "You are not allowed to delete %s" % package_name,
+                ))
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 def api_package_info(request, object_id):
     package = get_object_or_404(Package, name=object_id)
