@@ -5,6 +5,7 @@
 <div class="greybox">
     <h3>{% trans "My Packages" %}</h3>
     {% ifnotequal packages.count 0 %}
+    <form action="{% url aur-manage_packages %}" method="post">
     <table class="results" width="100%">
         <tr>
             <th>{% trans "Repository" %}</th>
@@ -12,6 +13,7 @@
             <th>{% trans "Description" %}</th>
             <th>{% trans "Category" %}</th>
             <th>{% trans "Last Updated" %}</th>
+            <th>&nbsp;</th>
         </tr>
         {% for package in packages %}
         <tr class="{% cycle 'pkgr1' 'pkgr2' %}">
@@ -20,9 +22,24 @@
             <td>{{ package.description }}</td>
             <td>{{ package.category.name }}</td>
             <td>{{ package.updated|date:"Y-m-d H:i:s" }}</td>
+            <td><input type="checkbox" name="packages" value="{{ package.name }}" /></td>
         </tr>
         {% endfor %}
     </table>
+    <br />
+    <div style="text-align: right">
+        With selected packages:
+        <select name="action">
+            <option value="disown">disown</option>
+            <option value="flag-ood">flag out of date</option>
+            <option value="unflag-ood">unflag out of date</option>
+            {% if user.get_profile.is_moderator %}
+            <option value="delete">delete</option>
+            {% endif %}
+        </select>
+        <input type="submit" value="{% trans "Go" %}" />
+    </div>
+    </form>
     {% else %}
     <p>You have not submitted any packages yet. How about making a
     <a href="http://wiki.archlinux.org/index.php/Arch_Packaging_Standards">PKGBUILD</a>

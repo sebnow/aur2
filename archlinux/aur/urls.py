@@ -21,6 +21,7 @@ urlpatterns = patterns('archlinux.aur.views',
     (r'^api/search/(?P<query>[\w\d_ -]+)/$', 'api_search'),
     (r'^api/get_package_info/(?P<object_id>[\w_-]+)/$', 'api_package_info'),
     (r'^api/get_package_comments/(?P<object_id>[\w_-]+)/$', 'api_package_comments'),
+    url(r'^manage_packages/$', 'manage_packages', name='aur-manage_packages'),
 )
 
 # Generic views

@@ -34,7 +34,11 @@
 </div>
 <br />
 
+{% with user.get_profile.is_moderator as is_moderator %}
 <div class="greybox">
+    {% if is_moderator %}
+    <form action="{% url aur-manage_packages %}" method="post">
+    {% endif %}
     <table class="results" width="100%">
         <tr>
             <th>{% trans "Repository" %}</th>
@@ -43,6 +47,9 @@
             <th>{% trans "Category" %}</th>
             <th>{% trans "Maintainer" %}</th>
             <th style="width: 9em">{% trans "Last Updated" %}</th>
+            {% if is_moderator %}
+            <th>&nbsp;</th>
+            {% endif %}
         </tr>
         {% ifnotequal packages.count 0 %}
         {% for package in packages %}
@@ -53,6 +60,9 @@
             <td>{{ package.category.name }}</td>
             <td>{{ package.maintainers.all|join:", " }}</td>
             <td>{{ package.updated|date:"Y-m-d H:i:s" }}</td>
+            {% if is_moderator %}
+            <td><input type="checkbox" name="packages" value="{{ package.name }}" /></td>
+            {% endif %}
         </tr>
         {% endfor %}
         {% else %}
@@ -66,7 +76,22 @@
         </tr>
         {% endif %}
         {% endifnotequal %}
-    </table>{% if pager.has_pagination %}
+    </table>
+    {% if is_moderator %}
+    <br />
+    <div style="text-align: right">
+        With selected packages:
+        <select name="action">
+            <option value="disown">disown</option>
+            <option value="adopt">adopt</option>
+            <option value="flag-ood">flag out of date</option>
+            <option value="unflag-ood">unflag out of date</option>
+            <option value="delete">delete</option>
+        </select>
+        <input type="submit" value="{% trans "Go" %}" />
+    </div>
+    {% endif %}
+    </form>{% if pager.has_pagination %}
     <br />
     {% if pager.has_previous_page %}<span style="float: left"><a href="{{ pager.previous_link }}">&lt;&lt;&lt; {% trans "Previous" %}</a></span>{% endif %}
     {% if pager.has_next_page %}<span style="float: right"><a href="{{ pager.next_link }}">{% trans "Next" %} &gt;&gt;&gt;</a></span>{% endif %}
@@ -79,4 +104,5 @@
     {% endfor %}
     </div>{%endif %}
 </div>
+{% endwith %}
 {% endblock %}
