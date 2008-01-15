@@ -31,10 +31,13 @@ def search(request, query = ''):
         return HttpResponseRedirect(reverse('aur-package_detail',
             args=[results[0].name,]))
     # Replace the current page with the new one if it's already in GET
+    full_path = request.get_full_path()
     if request.GET.has_key('page'):
         link_template = sub(r'page=\d+', 'page=%d', request.get_full_path())
+    elif full_path.find('?') >= 0:
+        link_template = full_path + '&page=%d'
     else:
-        link_template = request.get_full_path() + '&page=%d'
+        link_template = full_path + '?page=%d'
     # Initialise the pagination
     paginator = BetterPaginator(results, int(form.get_or_default('limit')), link_template)
     paginator.set_page(int(request.GET.get('page', '1')))
