@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 
 from archlinux.aur.models import *
+from archlinux.aur.forms import PackageSearchForm, PackageSubmitForm
 
 def search(request, query = ''):
     if request.method == 'GET' and request.GET.has_key('query'):

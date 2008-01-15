@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 
-from archlinux.account.models import RegistrationForm, ProfileUpdateForm
+from archlinux.account.forms import RegistrationForm, ProfileUpdateForm
 from archlinux.aur.models import Package
 
 def register(request):
