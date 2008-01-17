@@ -1,0 +1,3 @@
+{{ package.name }}-{{ package.version }}-{{ package.release }} has been updated.
+
+For more information see http://aur.archlinux.org/{{ package.get_absolute_url }}
