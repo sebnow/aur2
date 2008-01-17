@@ -56,15 +56,15 @@ class PackageSearchForm(forms.Form):
         category = self.get_or_default('category')
         sortby = self.get_or_default('sortby')
         order = self.get_or_default('order')
+        query = self.get_or_default('query')
 
         # Find the packages by searching description and package name or maintainer
-        if self.get_or_default('query'):
+        if query:
             if self.get_or_default('searchby') == 'maintainer':
-                results = Package.objects.filter(maintainers__username__icontains=self.cleaned_data["query"])
+                results = Package.objects.filter(maintainers__username__icontains=query)
             else:
-                res1 = Package.objects.filter(name__icontains=self.cleaned_data["query"])
-                res2 = Package.objects.filter(description__icontains=self.cleaned_data["query"])
-                results = res1 | res2
+                results = Package.objects.filter(name__icontains=query)
+                results |= Package.objects.filter(description__icontains=query)
         else:
             results = Package.objects.all()
         # Restrict results
@@ -188,6 +188,10 @@ class PackageSubmitForm(forms.Form):
                 pass
             else:
                 package.depends.add(dep)
+        # Add provides
+        for provision in pkg['provides']:
+            object, created = Provision.objects.get_or_create(name=provision)
+            package.provides.add(object)
         # Add licenses
         for license in pkg['licenses']:
             object, created = License.objects.get_or_create(name=license)
