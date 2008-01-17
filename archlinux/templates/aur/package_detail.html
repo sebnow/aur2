@@ -64,7 +64,19 @@
                         <li>{% trans "None" %}</li>
                     {% endifnotequal %}</ul>
                 </div>
-            </td><td colspan="2" valign="top">
+            </td><td valign="top">
+                <div class="listing">
+                    <h4>{% trans "Reverse dependencies" %}:</h4>
+                    <ul style="font-size:small;list-style:none">
+                    {% ifnotequal pkg.reverse_depends.all.count 0 %}
+                        {% for dep in pkg.reverse_depends.all %}
+                        <li><a href="{{ dep.get_absolute_url }}">{{ dep.name }}</a></li>
+                        {% endfor %}
+                    {% else %}
+                        <li>{% trans "None" %}</li>
+                    {% endifnotequal %}</ul>
+                </div>
+            </td><td valign="top">
                 <div class="listing">
                     <h4>{% trans "Sources" %}:</h4>
                     <ul style="font-size:small;list-style:none">
