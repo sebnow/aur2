@@ -213,9 +213,9 @@ class PackageNotification(models.Model):
 
 # Should this be here?
 def email_package_updates(sender, instance, signal, *args, **kwargs):
+    import archlinux.settings as settings
     """Send notification to users of modification to a Package"""
     subject = "Archlinux AUR: %s updated" % instance.name
-    sender = 'xilon'
     mail_list = []
     notifications = PackageNotification.objects.filter(package=instance)
     for notification in notifications:
@@ -223,7 +223,7 @@ def email_package_updates(sender, instance, signal, *args, **kwargs):
             'package': instance,
             'user': notification.user,
         })
-        mail_list.append((subject, message, sender,
+        mail_list.append((subject, message, settings.EMAIL_HOST_USER,
             (notification.user.email,)))
     return send_mass_mail(mail_list)
 
