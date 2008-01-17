@@ -67,6 +67,16 @@ class Group(models.Model):
         pass
 
 
+class Provision(models.Model):
+    name = models.CharField(max_length=30)
+
+    def __unicode__(self):
+        return self.name
+
+    class Admin:
+        pass
+
+
 class Package(models.Model):
     name = models.CharField(primary_key=True, max_length=30)
     version = models.CharField(max_length=20)
@@ -83,12 +93,11 @@ class Package(models.Model):
             related_name="reverse_depends", symmetrical=False)
     make_depends = models.ManyToManyField('self', null=True, blank=True,
             related_name="reverse_make_depends", symmetrical=False)
-    provides = models.ManyToManyField('self', null=True, blank=True,
-            related_name="reverse_provides", symmetrical=False)
     replaces = models.ManyToManyField('self', null=True, blank=True,
-            related_name="reverse_replaces", symmetrical=False)
+            related_name='reverse_replaces', symmetrical=False)
     conflicts = models.ManyToManyField('self', null=True, blank=True,
             related_name="reverse_conflicts", symmetrical=False)
+    provides = models.ManyToManyField(Provision, null=True, blank=True)
     deleted = models.BooleanField(default=False)
     outdated = models.BooleanField(default=False)
     added = models.DateTimeField(editable=False, default=datetime.now())
