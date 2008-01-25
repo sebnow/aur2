@@ -64,7 +64,6 @@ def search(request, query = ''):
         'request': request,
     })
 
-# TODO: Implement transactions
 @login_required
 def submit(request):
     if request.method == 'POST':
