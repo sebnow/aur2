@@ -25,16 +25,6 @@ class PackageSearchForm(forms.Form):
         ('maintainer', 'Maintainer'),
     ))
     lastupdate = forms.DateTimeField(label="Last Update", required=False)
-    sortby = forms.ChoiceField(initial='name', label="Sort By", choices=(
-        ('name', 'Package Name'),
-        ('category', 'Category'),
-        ('repository', 'Repository'),
-        ('updated', 'Last Updated'),
-    ))
-    order = forms.ChoiceField(initial='asc', choices=(
-        ('asc', 'Ascending'),
-        ('desc', 'Descending'),
-    ))
     limit = forms.ChoiceField(initial='25', choices=(
         (25, 25),
         (50, 50),
@@ -54,8 +44,6 @@ class PackageSearchForm(forms.Form):
         repository = self.get_or_default('repository')
         lastupdate = self.get_or_default('lastupdate')
         category = self.get_or_default('category')
-        sortby = self.get_or_default('sortby')
-        order = self.get_or_default('order')
         query = self.get_or_default('query')
 
         # Find the packages by searching description and package name or maintainer
@@ -74,11 +62,6 @@ class PackageSearchForm(forms.Form):
             results = results.filter(category__name__exact=category)
         if lastupdate:
             results = results.filter(updated__gte=lastupdate)
-        # Change the sort order if necessary
-        if order == 'desc':
-            results = results.order_by('-' + sortby, 'repository', 'category', 'name')
-        else:
-            results = results.order_by(sortby, 'repository', 'category', 'name')
         return results
 
 
