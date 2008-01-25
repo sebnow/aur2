@@ -29,6 +29,17 @@ def search(request, query = ''):
         form = PackageSearchForm()
     # Execute the search
     results = form.search()
+    # Get sorting variables from query string or fallback on defaults
+    if request.GET.has_key('sortby'):
+        sortby = request.GET['sortby']
+        if sortby == 'maintainer':
+            sortby = 'name'
+    else:
+        sortby = 'name'
+    if request.GET.has_key('order') and request.GET['order'] == 'desc':
+        sortby = "".join(('-', sortby))
+    # Sort the results
+    results = results.order_by(sortby, 'repository', 'category', 'name')
     # If we only got one hit, just go to the package's detail page
     if form.is_bound and results.count() == 1:
         return HttpResponseRedirect(reverse('aur-package_detail',
@@ -50,6 +61,7 @@ def search(request, query = ''):
         'packages': paginator.get_page(),
         'pager': paginator,
         'user': request.user,
+        'request': request,
     })
 
 # TODO: Implement transactions
