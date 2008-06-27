@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import *
 from archlinux.aur.models import Package
+from django.conf import settings
 
 detail_dict = {
     'queryset': Package.objects.all(),
@@ -30,3 +31,8 @@ urlpatterns += patterns('django.views.generic',
     (r'^package/(?P<object_id>[\w_-]+)/$', 'list_detail.object_detail',
         dict(detail_dict), 'aur-package_detail'),
 )
+
+if settings.DEBUG == True:
+	urlpatterns += patterns('',
+		(r'^media/(.*)$', 'django.views.static.serve',
+			{'document_root': settings.DEPLOY_PATH+'/media'}))
