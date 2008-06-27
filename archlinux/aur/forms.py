@@ -70,11 +70,11 @@ class PackageField(forms.FileField):
     def __init__(self, *args, **kwargs):
         super(forms.FileField, self).__init__(*args, **kwargs)
 
-    def clean(self, data):
+    def clean(self, data, initial=None):
         import tempfile
         import tarfile
         try:
-            file = super(PackageField, self).clean(data)
+            file = super(PackageField, self).clean(data, initial)
         except:
             raise
         errors = list()
