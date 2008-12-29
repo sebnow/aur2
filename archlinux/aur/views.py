@@ -7,7 +7,7 @@ import hashlib
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from BetterPaginator import BetterPaginator
-from django import newforms as forms # This will change to forms in 0.68 or 1.0
+from django import forms
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.core import serializers
