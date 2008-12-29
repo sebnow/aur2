@@ -1,4 +1,4 @@
-from django import newforms as forms
+from django import forms
 
 from archlinux.aur.models import *
 import archlinux.aur.Package as PKGBUILD
