@@ -6,8 +6,8 @@ import hashlib
 
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
-from BetterPaginator import BetterPaginator
 from django import forms
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.core import serializers
@@ -44,22 +44,18 @@ def search(request, query = ''):
     if form.is_bound and results.count() == 1:
         return HttpResponseRedirect(reverse('aur-package_detail',
             args=[results[0].name,]))
-    # Replace the current page with the new one if it's already in GET
-    full_path = request.get_full_path()
-    if request.GET.has_key('page'):
-        link_template = sub(r'page=\d+', 'page=%d', request.get_full_path())
-    elif full_path.find('?') >= 0:
-        link_template = full_path + '&page=%d'
-    else:
-        link_template = full_path + '?page=%d'
     # Initialise the pagination
-    paginator = BetterPaginator(results, int(form.get_or_default('limit')), link_template)
-    paginator.set_page(int(request.GET.get('page', '1')))
+    paginator = Paginator(results, int(form.get_or_default('limit')))
+    # Use last page if page number is out of range
+    try:
+        page = paginator.page(int(request.GET.get('page', '1')))
+    except (EmptyPage, InvalidPage):
+        page = paginator.page(paginator.num_pages)
 
     return render_to_response('aur/search.html', {
         'form': form,
-        'packages': paginator.get_page(),
-        'pager': paginator,
+        'packages': page.object_list,
+        'page': page,
         'user': request.user,
         'request': request,
     })
