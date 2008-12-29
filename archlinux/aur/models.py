@@ -252,14 +252,11 @@ def remove_package_tarball(sender, instance, signal, *args, **kwargs):
     instance.delete_tarball()
 
 # Send notifications of updates to users on saves and deltion of packages
-dispatcher.connect(email_package_updates, signal=signals.post_save,
-        sender=Package)
-dispatcher.connect(email_package_updates, signal=signals.post_delete,
-        sender=Package)
+signals.post_save.connect(email_package_updates, sender=Package)
+signals.post_delete.connect(email_package_updates, sender=Package)
 # Remove files when packages get deleted
 # Django doesn't call each instance's delete() on cascade, but it does send
 # pre_delete signals
-dispatcher.connect(remove_packagefile_filename, signal=signals.pre_delete,
-        sender=PackageFile)
-dispatcher.connect(remove_package_tarball, signal=signals.pre_delete,
-        sender=Package)
+signals.pre_delete.connect(remove_packagefile_filename, sender=PackageFile)
+signals.pre_delete.connect(remove_package_tarball, sender=Package)
+
