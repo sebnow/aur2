@@ -80,9 +80,10 @@ class PackageField(forms.FileField):
         errors = list()
         # Save the uploaded file to disk
         directory = tempfile.mkdtemp()
-        filename = os.path.join(directory, file.filename)
+        filename = os.path.join(directory, file.name)
         fp = open(filename, "wb")
-        fp.write(file.content)
+        for chunk in file.chunks():
+            fp.write(chunk)
         fp.close()
 
         # Try to parse the PKGBUILD
