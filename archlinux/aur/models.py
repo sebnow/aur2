@@ -17,9 +17,6 @@ class Category(models.Model):
     def __unicode__(self):
         return self.name
 
-    class Admin:
-        pass
-
     class Meta:
         verbose_name_plural = 'categories'
 
@@ -30,18 +27,12 @@ class Architecture(models.Model):
     def __unicode__(self):
         return self.name
 
-    class Admin:
-        pass
-
 
 class Repository(models.Model):
     name = models.CharField(max_length=20)
 
     def __unicode__(self):
         return self.name
-
-    class Admin:
-        pass
 
     class Meta:
         verbose_name_plural = 'repositories'
@@ -53,9 +44,6 @@ class License(models.Model):
     def __unicode__(self):
         return self.name
 
-    class Admin:
-        pass
-
 
 class Group(models.Model):
     name = models.CharField(max_length=10)
@@ -63,18 +51,12 @@ class Group(models.Model):
     def __unicode__(self):
         return self.name
 
-    class Admin:
-        pass
-
 
 class Provision(models.Model):
     name = models.CharField(max_length=30)
 
     def __unicode__(self):
         return self.name
-
-    class Admin:
-        pass
 
 
 class Package(models.Model):
@@ -136,9 +118,6 @@ class Package(models.Model):
                 raw_contents, save)
         field.upload_to = old_upload_to
 
-    class Admin:
-        list_display = ('name', 'category', 'get_arch', 'updated')
-
     class Meta:
         ordering = ('-updated',)
         get_latest_by = 'updated'
@@ -173,9 +152,6 @@ class PackageFile(models.Model):
     def __unicode__(self):
         return self.filename
 
-    class Admin:
-        pass
-
 class PackageHash(models.Model):
     # sha512 hashes are 128 characters
     hash = models.CharField(max_length=128, primary_key=True)
@@ -187,9 +163,6 @@ class PackageHash(models.Model):
 
     class Meta:
         verbose_name_plural = 'package hashes'
-
-    class Admin:
-        pass
 
 
 class Comment(models.Model):
@@ -204,9 +177,6 @@ class Comment(models.Model):
     def __unicode__(self):
         return self.message
 
-    class Admin:
-        pass
-
 
 class PackageNotification(models.Model):
     user = models.ForeignKey(User)
@@ -215,9 +185,6 @@ class PackageNotification(models.Model):
     def __unicode__(self):
         return u"%s's subscription to %s updates" % (self.user.username,
                 self.package.name)
-
-    class Admin:
-        pass
 
 
 # Should this be here?

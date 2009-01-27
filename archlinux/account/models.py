@@ -32,5 +32,3 @@ class ArchUser(models.Model):
     def __unicode__(self):
         return smart_unicode(self.user)
 
-    class Admin:
-        list_display = ('user', 'is_inactive')
