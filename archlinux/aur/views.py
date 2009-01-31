@@ -115,9 +115,9 @@ def denotify_of_updates(request, object_id):
     return HttpResponseRedirect(reverse('aur-package_detail',
         args=[object_id,]))
 
-def api_search(request, query):
+def api_search(request, query, format):
     results = Package.objects.filter(name__icontains=query)
-    data = serializers.serialize('json', results,
+    data = serializers.serialize(format, results,
             fields=(
                 'name',
                 'version',
@@ -125,7 +125,7 @@ def api_search(request, query):
                 'description'
             )
     )
-    return HttpResponse(data, mimetype="text/plain")
+    return HttpResponse(data, mimetype="application/%s" % format)
 
 @login_required
 def manage_packages(request):
@@ -188,13 +188,13 @@ def manage_packages(request):
                 ))
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
-def api_package_info(request, object_id):
+def api_package_info(request, object_id, format):
     package = get_object_or_404(Package, name=object_id)
-    data = serializers.serialize('json', [package,])
-    return HttpResponse(data, mimetype="text/plain")
+    data = serializers.serialize(format, [package,])
+    return HttpResponse(data, mimetype="application/%s" % format)
 
 def api_package_comments(request, object_id):
     comments = Comment.objects.filter(package=object_id)
     data = serializers.serialize('json', comments)
-    return HttpResponse(data, mimetype="text/plain")
+    return HttpResponse(data, mimetype="application/%s" % format)
 
