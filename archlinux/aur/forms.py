@@ -214,11 +214,15 @@ class PackageSubmitForm(forms.Form):
         # security
         if not is_tarfile:
             # We only have the PKGBUILD, so lets make a tarball
-            tar = tarfile.open(os.path.join(tmpdir, '%s.tar.gz' % pkg['name']),
-                    "w|gz")
-            tar.add(pkg['filename'], '%s/PKGBUILD' % pkg['name'])
-            tar.close()
-            pkg['filename'] = os.path.join(tmpdir, '%s.tar.gz' % pkg['name'])
+            try:
+                tarball_path = os.path.join(tmpdir, pkg['name'] + '.tar.gz')
+                tar = tarfile.open(tarball_path, "w|gz")
+                tar.add(pkg['filename'], '%s/PKGBUILD' % pkg['name'])
+                tar.close()
+                pkg['filename'] = os.path.join(tmpdir, '%s.tar.gz' % pkg['name'])
+            except:
+                transaction.rollback()
+                raise
         fp = File(open(pkg['filename'], "rb"))
         package.tarball.save(os.path.join('%(name)s', os.path.basename(pkg['filename'])), fp)
         fp.close()
