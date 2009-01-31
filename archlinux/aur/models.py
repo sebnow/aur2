@@ -10,6 +10,25 @@ from django.utils.encoding import smart_unicode
 from datetime import datetime
 import os
 
+def _get_package_upload_to(instance, filename):
+    """Returns a string, replacing the name placeholder with a packages name
+
+    *instance* should be a :class:`PackageFile` or :class:`Package` instance.
+
+    *filename* should be a a string with a named placeholder where the name
+    should be inserted, e.g. ``'%(name)s/sources/PKGBUILD'``.
+
+    .. note::
+
+        This is meant for use by :class:`PackageFile` and :class:`Package` as
+        the *upload_to* callable
+    """
+    if hasattr(instance, 'package'):
+        package = instance.package
+    else:
+        package = instance
+    return os.path.join('packages', filename % {'name': package.name})
+
 
 class Category(models.Model):
     name = models.CharField(max_length=20)
@@ -68,7 +87,7 @@ class Package(models.Model):
     maintainers = models.ManyToManyField(User)
     repository = models.ForeignKey(Repository)
     category = models.ForeignKey(Category)
-    tarball = models.FileField(upload_to='packages')
+    tarball = models.FileField(upload_to=_get_package_upload_to)
     licenses = models.ManyToManyField(License, null=True, blank=True)
     architectures = models.ManyToManyField(Architecture)
     depends = models.ManyToManyField('self', null=True, blank=True,
@@ -95,7 +114,7 @@ class Package(models.Model):
 
     def get_tarball_basename(self):
         """Return the basename of the absolute path to the tarball"""
-        return os.path.basename(self.get_tarball_filename())
+        return os.path.basename(self.tarball.path())
 
     def get_absolute_url(self):
         return ('aur-package_detail', [self.name,])
@@ -107,16 +126,8 @@ class Package(models.Model):
 
     def delete_tarball(self):
         """Remove Package's tarball"""
-        os.remove(self.get_tarball_filename())
-        os.rmdir(os.path.dirname(self.get_tarball_filename()))
-
-    def _save_FIELD_file(self, field, filename, raw_contents, save=True):
-        old_upload_to=field.upload_to
-        dirname, filename = filename.rsplit(os.path.sep, 1)
-        field.upload_to = os.path.join(field.upload_to, dirname)
-        super(Package, self)._save_FIELD_file(field, filename,
-                raw_contents, save)
-        field.upload_to = old_upload_to
+        os.remove(self.tarball.path)
+        os.rmdir(os.path.dirname(self.tarball.path))
 
     class Meta:
         ordering = ('-updated',)
@@ -126,28 +137,20 @@ class Package(models.Model):
 class PackageFile(models.Model):
     package = models.ForeignKey(Package)
     # filename for local sources and url for external
-    filename = models.FileField(upload_to='packages', null=True, blank=True)
+    filename = models.FileField(upload_to=_get_package_upload_to, null=True, blank=True)
     url = models.URLField(null=True, blank=True)
 
     def get_absolute_url(self):
         if self.filename:
-            return self.get_filename_url()
+            return self.filename.url
         else:
             return self.url
 
     def get_filename(self):
         if self.filename:
-            return os.path.basename(self.get_filename_filename())
+            return os.path.basename(self.filename.path)
         else:
             return self.url
-
-    def _save_FIELD_file(self, field, filename, raw_contents, save=True):
-        old_upload_to=field.upload_to
-        dirname, filename = filename.rsplit(os.path.sep, 1)
-        field.upload_to = os.path.join(field.upload_to, dirname)
-        super(PackageFile, self)._save_FIELD_file(field, filename,
-                raw_contents, save)
-        field.upload_to = old_upload_to
 
     def __unicode__(self):
         return self.filename
