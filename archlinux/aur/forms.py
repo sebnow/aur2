@@ -1,4 +1,5 @@
 from django import forms
+from django.core.files import File
 
 from archlinux.aur.models import *
 import archlinux.aur.Package as PKGBUILD
@@ -68,15 +69,13 @@ class PackageSearchForm(forms.Form):
 class PackageField(forms.FileField):
     widget = forms.widgets.FileInput
     def __init__(self, *args, **kwargs):
-        super(forms.FileField, self).__init__(*args, **kwargs)
+        super(PackageField, self).__init__(*args, **kwargs)
 
     def clean(self, data, initial=None):
         import tempfile
         import tarfile
-        try:
-            file = super(PackageField, self).clean(data, initial)
-        except:
-            raise
+        file = super(PackageField, self).clean(data, initial)
+
         errors = list()
         # Save the uploaded file to disk
         directory = tempfile.mkdtemp()
@@ -201,17 +200,15 @@ class PackageSubmitForm(forms.Form):
             PackageFile.objects.filter(package=pkg['name']).delete()
             package.delete_tarball()
         # Hash and save PKGBUILD
-        fp = open(pkgbuild, "r")
-        pkgbuild_contents = ''.join(fp.readlines())
-        fp.close()
+        fp = File(open(pkgbuild, "r"))
         source = PackageFile(package=package)
-        source.save_filename_file('%s/sources/PKGBUILD' % pkg['name'],
-                pkgbuild_contents)
+        source.filename.save('%(name)s/sources/PKGBUILD', fp)
         source.save()
-        md5hash = hashlib.md5(pkgbuild_contents)
+        fp.seek(0)
+        md5hash = hashlib.md5(''.join(fp.readlines()))
         hash = PackageHash(hash=md5hash.hexdigest(), file=source, type='md5')
         hash.save()
-        del pkgbuild_contents
+        fp.close()
         # Save tarball
         # TODO: Tar the saved sources instead of using the uploaded one, for
         # security
@@ -222,9 +219,8 @@ class PackageSubmitForm(forms.Form):
             tar.add(pkg['filename'], '%s/PKGBUILD' % pkg['name'])
             tar.close()
             pkg['filename'] = os.path.join(tmpdir, '%s.tar.gz' % pkg['name'])
-        fp = open(pkg['filename'], "rb")
-        package.save_tarball_file('%s/%s' % (pkg['name'],
-            os.path.basename(pkg['filename'])), ''.join(fp.readlines()))
+        fp = File(open(pkg['filename'], "rb"))
+        package.tarball.save(os.path.join('%(name)s', os.path.basename(pkg['filename'])), fp)
         fp.close()
         # Save source files
         for index in range(len(pkg['source'])):
@@ -233,10 +229,9 @@ class PackageSubmitForm(forms.Form):
             # If it's a local file, save to disk, otherwise record as url
             if is_tarfile and os.path.exists(os.path.join(tmpdir_sources,
                package.name, source_filename)):
-                    fp = open(os.path.join(tmpdir_sources, pkg['name'],
-                        source_filename), "r")
-                    source.save_filename_file('%s/sources/%s' % (pkg['name'],
-                        source_filename), ''.join(fp.readlines()))
+                    fp = File(open(os.path.join(tmpdir_sources, pkg['name'],
+                        source_filename), "r"))
+                    source.filename.save('%(name)s/sources/' + source_filename, fp)
                     fp.close()
             else:
                 # TODO: Check that it _is_ a url, otherwise report an error
@@ -252,9 +247,8 @@ class PackageSubmitForm(forms.Form):
         for file in pkg['install']:
             source = PackageFile(package=package)
             source_path = os.path.join(tmpdir_sources, pkg['name'], file)
-            fp = open(source_path, "r")
-            source.save_filename_file('%s/install/%s' % (pkg['name'], file),
-                    ''.join(fp.readlines()))
+            fp = File(open(source_path, "r"))
+            source.filename.save('%(name)s/install/' + file, fp)
             fp.close()
             source.save()
         transaction.commit()
