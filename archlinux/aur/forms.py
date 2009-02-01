@@ -220,7 +220,7 @@ class PackageSubmitForm(forms.Form):
             # We only have the PKGBUILD, so lets make a tarball
             try:
                 tarball_path = os.path.join(tmpdir, pkg['name'] + '.tar.gz')
-                tar = tarfile.open(tarball_path, "w|gz")
+                tar = tarfile.open(str(tarball_path), "w|gz")
                 tar.add(pkg['filename'], '%s/PKGBUILD' % pkg['name'])
                 tar.close()
                 pkg['filename'] = os.path.join(tmpdir, '%s.tar.gz' % pkg['name'])
