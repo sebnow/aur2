@@ -18,15 +18,19 @@ class PackageSearchForm(forms.Form):
         self.fields['category'].choices = category_choices
         self.fields['repository'].choices = repository_choices
 
-    repository = forms.ChoiceField(initial='all', choices=())
-    category = forms.ChoiceField(initial='all', choices=())
+    repository = forms.ChoiceField(initial='all', choices=(), required=False)
+    category = forms.ChoiceField(initial='all', choices=(), required=False)
     query = forms.CharField(max_length=30, label="Keywords", required=False)
-    searchby = forms.ChoiceField(initial='name', label="Search By",choices=(
-        ('name', 'Package Name'),
-        ('maintainer', 'Maintainer'),
-    ))
+    searchby = forms.ChoiceField(
+        initial='name',
+        required=False,
+        label="Search By",choices=(
+            ('name', 'Package Name'),
+            ('maintainer', 'Maintainer'),
+        )
+    )
     lastupdate = forms.DateTimeField(label="Last Update", required=False)
-    limit = forms.ChoiceField(initial='25', choices=(
+    limit = forms.ChoiceField(initial='25', required=False, choices=(
         (25, 25),
         (50, 50),
         (75, 75),
@@ -37,7 +41,7 @@ class PackageSearchForm(forms.Form):
     def get_or_default(self, key):
         if not self.is_bound:
             return self.fields[key].initial
-        return self.cleaned_data.get(key, self.fields[key].initial)
+        return self.cleaned_data.get(key) or self.fields[key].initial
 
     def search(self):
         if self.is_bound and not self.is_valid():
