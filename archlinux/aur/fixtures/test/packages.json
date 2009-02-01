@@ -1,0 +1,36 @@
+[
+    {
+        "pk": 1,
+        "model": "aur.package",
+        "fields": {
+			"name": "unique_package",
+            "tags": ["unique"],
+            "updated": "2009-01-01 00:00:00",
+            "added": "2009-01-01 00:00:00",
+            "description": "No other package should have 'unique' in its name",
+            "repository": 1,
+            "url": "",
+            "groups": [],
+            "replaces": [],
+            "deleted": false,
+            "depends": [],
+            "provides": [],
+            "tarball": "packages/unique_package/unique_package.tar",
+            "maintainers": [
+                2
+            ],
+            "version": "1",
+            "architectures": [
+                1
+            ],
+            "make_depends": [],
+            "release": 1,
+            "licenses": [
+                1
+            ],
+            "conflicts": [],
+            "outdated": false
+        }
+    }
+]
+

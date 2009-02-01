@@ -13,6 +13,7 @@ automatically.
 For more information about the development process see the `AUR 2 article on
 the Archlinux wiki <http://wiki.archlinux.org/index.php/AUR_2>`_
 
+
 Dependencies
 ============
 
@@ -46,3 +47,7 @@ The *EMAIL_HOST* and *EMAIL_PORT* settings should be configured appropriately.
 For development purposes, a dummy server can be used instead::
 
     python -m smtpd -n -c DebuggingServer localhost:1025
+
+At this point it would be a good idea to run all tests, to make sure everything works::
+
+    python manage.py test
