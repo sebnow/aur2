@@ -35,7 +35,6 @@
 </div>
 <br />
 
-{% with user.get_profile.is_moderator as is_moderator %}
 <div class="greybox">
     {% if is_moderator %}
     <form action="{% url aur-manage_packages %}" method="post">
@@ -119,5 +118,4 @@
     {% if page.has_next %}<span style="float: right"><a href="?page={{ page.next_page_number }}">{% trans "Next" %} &gt;&gt;&gt;</a></span>{% endif %}
     {%endif %}
 </div>
-{% endwith %}
 {% endblock %}

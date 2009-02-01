@@ -8,6 +8,7 @@ urlpatterns = patterns('',
 
     # Uncomment this for admin:
     (r'^admin/(.*)', admin.site.root),
-    (r'^accounts/', include('archlinux.account.urls')),
+    (r'^accounts/', include('registration.urls')),
+    (r'^profile/', include('aurprofile.urls')),
     (r'^', include('archlinux.aur.urls')),
 )

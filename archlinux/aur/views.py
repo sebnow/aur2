@@ -16,6 +16,44 @@ from django.utils.translation import ugettext
 from archlinux.aur.models import *
 from archlinux.aur.forms import PackageSearchForm, PackageSubmitForm
 
+# Helper functions for permissions
+# This should perhaps be elsewhere. In the future Django may support
+# permissions per object instance.
+def _user_can_modify_package(user, package):
+    """Returns whether a user has permissions to modify a specific package
+    *user* should be a :class:`User`
+    *package* should be a :class:`Package` object or a package name
+    """
+    if not isinstance(package, Package):
+        package = Package.objects.get(name=package)
+    return _user_is_maintainer(user, package) or user.has_perm('package.can_change_package')
+
+def _user_can_delete_package(user, package):
+    """Returns whether a user has permissions to delete a specific package
+    *user* should be a :class:`User`
+    *package* should be a :class:`Package` object or a package name
+    """
+    return user.has_perm('package.can_delete_package')
+
+def _user_is_maintainer(user, package):
+    """Returns whether a user is a maintainer of a specific package
+    *user* should be a :class:`User`
+    *package* should be a :class:`Package` object or a package name
+    """
+    if not isinstance(package, Package):
+        package = Package.objects.get(name=package)
+    return package.maintainers.filter(username=user.username).count() > 0
+
+def _user_is_moderator(user):
+    """Returns whether a user is a package moderator
+    *user* should be a :class:`User`
+    """
+    return user.has_perms((
+        'package.can_add_package',
+        'package.can_delete_package',
+        'package.can_change_package',
+    ))
+
 def search(request, query = ''):
     if request.method == 'GET' and request.GET.has_key('query'):
         form = PackageSearchForm(request.GET)
@@ -23,7 +61,8 @@ def search(request, query = ''):
         if not form.is_valid():
             return render_to_response('aur/search.html', {
                 'form': form,
-                'user': request.user
+                'user': request.user,
+                'is_moderator': _user_is_moderator(request.user),
             })
     else:
         form = PackageSearchForm()
@@ -58,6 +97,7 @@ def search(request, query = ''):
         'page': page,
         'user': request.user,
         'request': request,
+        'is_moderator': _user_is_moderator(request.user),
     })
 
 @login_required
@@ -135,7 +175,7 @@ def manage_packages(request):
     if request.POST['action'] == 'unflag-ood':
         for package_name in packages:
             package = Package.objects.get(name=package_name)
-            if request.user.get_profile().can_modify_package(package):
+            if _user_can_modify_package(request.user, package):
                 package.outdated = False
                 package.save()
             else:
@@ -146,7 +186,7 @@ def manage_packages(request):
     elif request.POST['action'] == 'flag-ood':
         for package_name in packages:
             package = Package.objects.get(name=package_name)
-            if request.user.get_profile().can_modify_package(package):
+            if _user_can_modify_package(request.user, package):
                 package.outdated = True
                 package.save()
             else:
@@ -157,7 +197,7 @@ def manage_packages(request):
     elif request.POST['action'] == 'disown':
         for package_name in packages:
             package = Package.objects.get(name=package_name)
-            if request.user.get_profile().can_modify_package(package):
+            if _user_can_modify_package(request.user, package):
                 package.maintainers.clear()
             else:
                 return render_to_response('aur/error.html', dict(
@@ -169,7 +209,7 @@ def manage_packages(request):
             package = Package.objects.get(name=package_name)
             if package.maintainers.count() == 0:
                 package.maintainers.add(request.user)
-            elif request.user.get_profile().is_moderator():
+            elif _user_is_moderator(request.user):
                 package.maintainers.add(request.user)
             else:
                 return render_to_response('aur/error.html', dict(
@@ -179,7 +219,7 @@ def manage_packages(request):
     elif request.POST['action'] == 'delete':
         for package_name in packages:
             package = Package.objects.get(name=package_name)
-            if request.user.get_profile().can_delete_package(package):
+            if _user_can_delete_package(request.user, package):
                 package.delete()
             else:
                 return render_to_response('aur/error.html', dict(

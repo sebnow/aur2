@@ -35,8 +35,6 @@ ADMIN_MEDIA_PREFIX = '/media/'
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
 
-AUTH_PROFILE_MODULE = 'account.ArchUser'
-
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.load_template_source',
@@ -65,6 +63,13 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.admin',
+    'django.contrib.sites',
     'archlinux.aur',
-    'archlinux.account',
+    'registration',
+    'aurprofile',
 )
+
+# Third party settings
+
+# django-registration
+ACCOUNT_ACTIVATION_DAYS = 1

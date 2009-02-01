@@ -17,6 +17,7 @@ Dependencies
 ============
 
 * `Django <http://www.djangoproject.com>`_ >= 1.0
+* `django-registration <http://bitbucket.org/ubernostrum/django-registration>`_
 
 If you use ``pip``, a ``pip-requirements.txt`` file is provided. It can be used as
 such::
@@ -60,3 +61,9 @@ left as is, but MEDIA_URL would have to to be changed. The suggested
 configuration is to set it to ``/media/admin/`` and symlink that directory to the
 admin media directory (``django/contrib/admin/media``) in your Django
 installation.
+
+A functioning email server is necessary for various parts of the application.
+The *EMAIL_HOST* and *EMAIL_PORT* settings should be configured appropriately.
+For development purposes, a dummy server can be used instead::
+
+    python -m smtpd -n -c DebuggingServer localhost:1025

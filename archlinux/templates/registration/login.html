@@ -19,7 +19,7 @@
                 <td>{{ form.password }}</td></tr>
             <tr>
                 <td colspan="2" align="right">
-                    <input type="hidden" name="next" value="{% if next %}{{ next }}{% else %}{% url account.views.profile %}{% endif %}" />
+                    <input type="hidden" name="next" value="{% if next %}{{ next }}{% else %}{% url aurprofile_profile %}{% endif %}" />
                     <input type="submit" value="Login" />
                 </td>
             </tr>
