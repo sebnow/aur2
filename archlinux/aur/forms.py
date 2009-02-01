@@ -202,7 +202,7 @@ class PackageSubmitForm(forms.Form):
         # Remove all sources. It's easier and cleaner this way.
         if updating:
             PackageFile.objects.filter(package=pkg['name']).delete()
-            package.delete_tarball()
+            package.tarball.delete()
         # Hash and save PKGBUILD
         fp = File(open(pkgbuild, "r"))
         source = PackageFile(package=package)
