@@ -10,8 +10,8 @@ register = Library()
 def has_update_notification(user, package_pk):
     if not isinstance(user, User):
         return False
-    total = PackageNotification.objects.filter(user__username=user,
-            package=package_pk).count()
+    total = PackageNotification.objects.filter(user=user,
+        package=package_pk).count()
     return total != 0
 
 @register.filter
