@@ -1,6 +1,6 @@
 {% extends "base-sidebar.html" %}
 {% load i18n %}
-{% block extra_title %} - {% trans "My Account" %}{% endblock %}
+{% block extra_title %} - {% trans "My Profile" %}{% endblock %}
 {% block content_left %}
 <div class="greybox">
     <h3>{% trans "My Packages" %}</h3>
@@ -18,7 +18,7 @@
         {% for package in packages %}
         <tr class="{% cycle 'pkgr1' 'pkgr2' %}">
             <td>{{ package.repository }}</td>
-            <td><a{% if package.outdated %} class="error"{% endif %} href="/package/{{package.name}}/">{{ package.name }} {{ package.version }}-{{ package.release }}</a></td>
+            <td><a{% if package.outdated %} class="error"{% endif %} href="{{ package.get_absolute_url }}">{{ package.name }} {{ package.version }}-{{ package.release }}</a></td>
             <td>{{ package.description }}</td>
             <td>{{ package.category.name }}</td>
             <td>{{ package.updated|date:"Y-m-d H:i:s" }}</td>
@@ -33,7 +33,7 @@
             <option value="disown">disown</option>
             <option value="flag-ood">flag out of date</option>
             <option value="unflag-ood">unflag out of date</option>
-            {% if user.get_profile.is_moderator %}
+            {% if user.perms.package.can_delete %}
             <option value="delete">delete</option>
             {% endif %}
         </select>
@@ -64,11 +64,14 @@
 <br />
 <div class="greybox">
     <h3>{% trans "Account Details" %}</h3>
-    <form method="post" action="{% url account.views.update_profile %}">
-        <table>{% for field in form %}
+    <form method="post" action=".">
+        <table class="aurprofile_details">{% for field in form %}
             <tr>
                 <td>{{ field.label_tag }}: </td>
-                <td>{{ field }}</td>
+                <td>
+                    {{ field }}
+                    {% if field.errors %}<br />{{ field.errors }}{% endif %}
+                </td>
             </tr>
             {% endfor %}<tr>
                 <td colspan="2" style="text-align:right">

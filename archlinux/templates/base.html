@@ -14,9 +14,9 @@
     <body>
         <div id="login-or-register">
         {% if user.is_authenticated %}
-            {% trans "Logged in as" %} <a href="{% url account-my_profile %}">{{ user.username }}</a>. <a href="{% url account-logout %}">Logout</a>
+            {% trans "Logged in as" %} <a href="{% url aurprofile_profile %}">{{ user.username }}</a>. <a href="{% url auth_logout %}">Logout</a>
         {% else %}
-            <a href="{% url account-login %}">{% trans "Login" %}</a> {% trans "or" %} <a href="{% url account-register %}">{% trans "register" %}</a>
+            <a href="{% url auth_login %}">{% trans "Login" %}</a> {% trans "or" %} <a href="{% url registration_register %}">{% trans "register" %}</a>
         {% endif %}
         </div>
         <div id="head_container">
