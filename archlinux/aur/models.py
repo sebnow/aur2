@@ -124,11 +124,6 @@ class Package(models.Model):
         self.updated = datetime.now()
         super(Package, self).save()
 
-    def delete_tarball(self):
-        """Remove Package's tarball"""
-        os.remove(self.tarball.path)
-        os.rmdir(os.path.dirname(self.tarball.path))
-
     class Meta:
         ordering = ('-updated',)
         get_latest_by = 'updated'
@@ -210,16 +205,11 @@ def email_package_updates(sender, instance, signal, *args, **kwargs):
 def remove_packagefile_filename(sender, instance, signal, *args, **kwargs):
     """Remove PackageFile's file"""
     if instance.filename:
-        os.remove(instance.get_filename_filename())
-        try:
-            os.rmdir(os.path.dirname(instance.get_filename_filename()))
-        except:
-            pass
-
+        instance.filename.delete()
 
 def remove_package_tarball(sender, instance, signal, *args, **kwargs):
     """Remove Package's tarball"""
-    instance.delete_tarball()
+    instance.tarball.delete()
 
 # Send notifications of updates to users on saves and deltion of packages
 signals.post_save.connect(email_package_updates, sender=Package)
