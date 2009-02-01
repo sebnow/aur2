@@ -193,6 +193,8 @@ def email_package_updates(sender, instance, signal, *args, **kwargs):
     mail_list = []
     notifications = PackageNotification.objects.filter(package=instance)
     for notification in notifications:
+        if not notification.user.email:
+            continue
         message = render_to_string('aur/email_notification.txt', {
             'package': instance,
             'user': notification.user,
