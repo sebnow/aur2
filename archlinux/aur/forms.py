@@ -11,15 +11,11 @@ class PackageSearchForm(forms.Form):
     # Borrowed from AUR2-BR
     def __init__(self, *args, **kwargs):
         super(PackageSearchForm, self).__init__(*args, **kwargs)
-        category_choices = [('all', 'All')]
-        category_choices += [(category.name.lower(), category.name) for category in Category.objects.all()]
         repository_choices = [('all', 'All')]
         repository_choices += [(repository.name.lower(), repository.name) for repository in Repository.objects.all()]
-        self.fields['category'].choices = category_choices
         self.fields['repository'].choices = repository_choices
 
     repository = forms.ChoiceField(initial='all', choices=(), required=False)
-    category = forms.ChoiceField(initial='all', choices=(), required=False)
     query = forms.CharField(max_length=30, label="Keywords", required=False)
     searchby = forms.ChoiceField(
         initial='name',
@@ -48,7 +44,6 @@ class PackageSearchForm(forms.Form):
             return None
         repository = self.get_or_default('repository')
         lastupdate = self.get_or_default('lastupdate')
-        category = self.get_or_default('category')
         query = self.get_or_default('query')
 
         # Find the packages by searching description and package name or maintainer
@@ -58,13 +53,14 @@ class PackageSearchForm(forms.Form):
             else:
                 results = Package.objects.filter(name__icontains=query)
                 results |= Package.objects.filter(description__icontains=query)
+                # Split query to search for each word as a tag
+                for keyword in query.split():
+                    results |= Package.objects.filter(tags__exact=keyword)
         else:
             results = Package.objects.all()
         # Restrict results
         if repository != 'all':
             results = results.filter(repository__name__iexact=repository)
-        if category != 'all':
-            results = results.filter(category__name__exact=category)
         if lastupdate:
             results = results.filter(updated__gte=lastupdate)
         return results
@@ -127,14 +123,14 @@ class PackageField(forms.FileField):
 
 
 class PackageSubmitForm(forms.Form):
-    category = forms.ChoiceField(choices=())
+    repository = forms.ChoiceField(choices=())
     package = PackageField(label="PKGBUILD")
 
     # Borrowed from AUR2-BR
     def __init__(self, *args, **kwargs):
         super(PackageSubmitForm, self).__init__(*args, **kwargs)
-        category_choices = [(category.name.lower(), category.name) for category in Category.objects.all()]
-        self.fields['category'].choices = category_choices
+        repo_choices = [(repo.name.lower(), repo.name) for repo in Repository.objects.all()]
+        self.fields['repository'].choices = repo_choices
 
     @transaction.commit_manually
     def save(self, user):
@@ -155,8 +151,7 @@ class PackageSubmitForm(forms.Form):
         package.release=pkg['release']
         package.description=pkg['description']
         package.url=pkg['url']
-        package.repository=Repository.objects.get(name="Unsupported")
-        package.category=Category.objects.get(name=self.cleaned_data['category'])
+        package.repository=Repository.objects.get(name__iexact=self.cleaned_data['repository'])
         # Save the package so we can reference it
         package.save()
         if creating:

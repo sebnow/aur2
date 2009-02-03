@@ -7,6 +7,8 @@ from django.dispatch import dispatcher
 from django.template.loader import render_to_string
 from django.utils.encoding import smart_unicode
 
+from tagging.fields import TagField
+
 from datetime import datetime
 import os
 
@@ -28,16 +30,6 @@ def _get_package_upload_to(instance, filename):
     else:
         package = instance
     return os.path.join('packages', filename % {'name': package.name})
-
-
-class Category(models.Model):
-    name = models.CharField(max_length=20)
-
-    def __unicode__(self):
-        return self.name
-
-    class Meta:
-        verbose_name_plural = 'categories'
 
 
 class Architecture(models.Model):
@@ -79,14 +71,15 @@ class Provision(models.Model):
 
 
 class Package(models.Model):
-    name = models.CharField(primary_key=True, max_length=30)
+    name = models.CharField(unique=True, max_length=30, editable=False)
     version = models.CharField(max_length=20)
     release = models.SmallIntegerField()
     description = models.CharField(max_length=180)
     url = models.CharField(max_length=200, null=True, blank=True)
     maintainers = models.ManyToManyField(User)
     repository = models.ForeignKey(Repository)
-    category = models.ForeignKey(Category)
+    tags = TagField()
+    slug = models.SlugField(editable=False)
     tarball = models.FileField(upload_to=_get_package_upload_to)
     licenses = models.ManyToManyField(License, null=True, blank=True)
     architectures = models.ManyToManyField(Architecture)
@@ -117,11 +110,16 @@ class Package(models.Model):
         return os.path.basename(self.tarball.path())
 
     def get_absolute_url(self):
-        return ('aur-package_detail', [self.name,])
+        return ('aur-package_detail', [self.slug,])
     get_absolute_url = permalink(get_absolute_url)
 
     def save(self):
         self.updated = datetime.now()
+        if not self.slug:
+            import re
+            slug = re.sub('[^\w\s-]', '', self.name).strip().lower()
+            slug = re.sub('[-\s]+', '-', slug)
+            self.slug = slug
         super(Package, self).save()
 
     class Meta:
