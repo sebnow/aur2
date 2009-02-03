@@ -107,7 +107,7 @@ class Package(models.Model):
 
     def get_tarball_basename(self):
         """Return the basename of the absolute path to the tarball"""
-        return os.path.basename(self.tarball.path())
+        return os.path.basename(self.tarball.path)
 
     def get_absolute_url(self):
         return ('aur-package_detail', [self.slug,])
