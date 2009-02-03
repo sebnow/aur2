@@ -78,7 +78,7 @@ def search(request, query = ''):
     if request.GET.has_key('order') and request.GET['order'] == 'desc':
         sortby = "".join(('-', sortby))
     # Sort the results
-    results = results.order_by(sortby, 'repository', 'category', 'name')
+    results = results.order_by(sortby, 'repository', 'name')
     # If we only got one hit, just go to the package's detail page
     if form.is_bound and results.count() == 1:
         return HttpResponseRedirect(reverse('aur-package_detail',

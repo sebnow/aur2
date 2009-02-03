@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load aur_tags %}
+{% load tagging_tags %}
 {% block extra_title %} - {{ pkg.name }} {{ pkg.version }}-{{ pkg.release}}{% endblock %}
 {% block content %}
 <div class="box">
@@ -27,8 +28,9 @@
             <th>{% trans "Repository" %}:</th>
             <td>{{ pkg.repository.name }}</td>
         </tr><tr>
-        <th>{% trans "Category" %}:</th>
-            <td>{{ pkg.category.name }}</td>
+        <th>{% trans "Tags" %}:</th>
+            {% tags_for_object pkg as pkg_tags %}
+            <td>{{ pkg_tags|join:", " }}</td>
         </tr><tr>
             <th>{% trans "Description" %}:</th>
             <td>{{ pkg.description }}</td>

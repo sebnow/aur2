@@ -2,7 +2,6 @@ from archlinux.aur.models import *
 from django.contrib import admin
 
 admin.site.register(Architecture)
-admin.site.register(Category)
 admin.site.register(Comment)
 admin.site.register(Group)
 admin.site.register(License)

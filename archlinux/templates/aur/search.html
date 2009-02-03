@@ -45,7 +45,6 @@
                 <th><a href="{% url aur-search %}?sortby=repository&order=desc">{% trans "Repository" %}</a></th>
                 <th><a href="{% url aur-search %}?sortby=name&order=desc">{% trans "Name" %}</a></th>
                 <th><a href="{% url aur-search %}?sortby=description&order=desc">{% trans "Description" %}</a></th>
-                <th><a href="{% url aur-search %}?sortby=category&order=desc">{% trans "Category" %}</a></th>
                 <th>{% trans "Maintainer" %}</a></th>
                 <th style="width: 9em"><a href="{% url aur-search %}?sortby=lastupdated&order=desc">{% trans "Last Updated" %}</a></th>
                 {% if is_moderator %}
@@ -56,14 +55,12 @@
                     <th><a href="{% url aur-search %}?{{ request.META.QUERY_STRING|merge_query_string:"sortby=repository&order=desc"}}">{% trans "Repository" %}</a></th>
                     <th><a href="{% url aur-search %}?{{ request.META.QUERY_STRING|merge_query_string:"sortby=name&order=desc"}}">{% trans "Name" %}</a></th>
                     <th><a href="{% url aur-search %}?{{ request.META.QUERY_STRING|merge_query_string:"sortby=description&order=desc"}}">{% trans "Description" %}</a></th>
-                    <th><a href="{% url aur-search %}?{{ request.META.QUERY_STRING|merge_query_string:"sortby=category&order=desc"}}">{% trans "Category" %}</a></th>
                     <th>{% trans "Maintainer" %}</th>
                     <th style="width: 9em"><a href="{% url aur-search %}?{{ request.META.QUERY_STRING|merge_query_string:"sortby=updated&order=desc"}}">{% trans "Last Updated" %}</a></th>
                 {% else %}
                     <th><a href="{% url aur-search %}?{{ request.META.QUERY_STRING|merge_query_string:"sortby=repository&order=asc"}}">{% trans "Repository" %}</a></th>
                     <th><a href="{% url aur-search %}?{{ request.META.QUERY_STRING|merge_query_string:"sortby=name&order=asc"}}">{% trans "Name" %}</a></th>
                     <th><a href="{% url aur-search %}?{{ request.META.QUERY_STRING|merge_query_string:"sortby=description&order=asc"}}">{% trans "Description" %}</a></th>
-                    <th><a href="{% url aur-search %}?{{ request.META.QUERY_STRING|merge_query_string:"sortby=category&order=asc"}}">{% trans "Category" %}</a></th>
                     <th>{% trans "Maintainer" %}</th>
                     <th style="width: 9em"><a href="{% url aur-search %}?{{ request.META.QUERY_STRING|merge_query_string:"sortby=updated&order=asc"}}">{% trans "Last Updated" %}</a></th>
                 {% endifequal %}
@@ -78,7 +75,6 @@
             <td>{{ package.repository }}</td>
             <td><a{% if package.outdated %} class="error"{% endif %} href="{{ package.get_absolute_url }}">{{ package.name }} {{ package.version }}-{{ package.release }}</a></td>
             <td>{{ package.description }}</td>
-            <td>{{ package.category.name }}</td>
             <td>{{ package.maintainers.all|join:", " }}</td>
             <td>{{ package.updated|date:"Y-m-d H:i:s" }}</td>
             {% if is_moderator %}
