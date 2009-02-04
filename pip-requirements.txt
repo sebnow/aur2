@@ -1,3 +1,4 @@
 Django>=1.0
 django-registration>=0.7
 -e svn+http://django-tagging.googlecode.com/svn/trunk/#egg=tagging
+-e git://github.com/sebnow/parched.git#egg=parched

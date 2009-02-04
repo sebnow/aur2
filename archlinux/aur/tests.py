@@ -3,9 +3,13 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.core import mail
 from django.template import Template, Context
+from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files import File
+from django.contrib.auth import authenticate
 
-from aur.forms import PackageSearchForm
-from aur.models import Package, PackageNotification
+from aur.forms import PackageSearchForm, PackageSubmitForm
+from aur.models import Package, PackageNotification, Repository, PackageFile
 
 class AurTestCase(TestCase):
     fixtures = ['test/users', 'test/packages']
@@ -89,7 +93,7 @@ class AurModelTests(AurTestCase):
         # and its removal is attempted
         self.assertEquals(len(mail.outbox), 1)
 
-class AurFormTests(AurTestCase):
+class AurSearchFormTests(AurTestCase):
     def test_search_form(self):
         form = PackageSearchForm(data={
             'query': 'unique_package'
@@ -98,6 +102,55 @@ class AurFormTests(AurTestCase):
         results = form.search()
         self.assertEquals(results.count(), 1)
         self.assertEquals(results[0].name, 'unique_package')
+
+class AurSubmitFormTests(AurTestCase):
+    def setUp(self):
+        import tempfile
+        self._media_root = settings.MEDIA_ROOT
+        settings.MEDIA_ROOT = tempfile.mkdtemp()
+        self.fileobj = SimpleUploadedFile('PKGBUILD', """
+            pkgname="new_package"
+            pkgver=1.0
+            pkgrel=1
+            pkgdesc="test pkgbuild"
+            arch=(i686)
+            license=("MIT")
+            md5sums=()
+            source=()
+            build() {
+            }
+        """.strip())
+        self.repository = Repository.objects.all()[0].name.lower()
+        self.form = PackageSubmitForm(
+            {'repository': self.repository},
+            {'package': self.fileobj}
+        )
+        self.user = authenticate(username="normal_user", password="normal_user")
+
+    def tearDown(self):
+        settings.MEDIA_ROOT = self._media_root
+        self.fileobj.close()
+
+    def test_validate_sane(self):
+        self.assertTrue(self.form.is_valid(), "valid package did not validate:\n%r" % self.form.errors)
+
+    def test_submit_save_plain(self):
+        import os
+        self.form.save(self.user)
+        package = None
+        try:
+            package = Package.objects.get(name="new_package")
+        except Package.DoesNotExist:
+            self.fail("package was not saved to the database")
+        self.assertTrue(os.path.exists(package.tarball.path))
+        found = False
+        # FIXME: This is stupid
+        for f in PackageFile.objects.filter(package=package):
+            if f.filename and f.filename.name.find("PKGBUILD") >= 0:
+                found = True
+                self.assertTrue(os.path.exists(f.filename.path))
+        self.assertTrue(found, "PKGBUILD was not uploaded")
+        self.assertTrue(os.path.exists(package.tarball.path))
 
 
 class AurTemplateTagTests(AurTestCase):

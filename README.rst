@@ -20,11 +20,14 @@ Dependencies
 * `Django <http://www.djangoproject.com>`_ >= 1.0
 * `django-registration <http://bitbucket.org/ubernostrum/django-registration>`_
 * `django-tagging <http://code.google.com/p/django-tagging>`_
+* parched_
 
 If you use ``pip``, a ``pip-requirements.txt`` file is provided. It can be used as
 such::
 
     pip install -r pip-requirements.txt
+
+.. _parched: http://www.github.com/sebnow/parched/
 
 
 Configuration
