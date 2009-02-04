@@ -7,11 +7,11 @@ import re
 register = Library()
 
 @register.filter
-def has_update_notification(user, package_pk):
+def has_update_notification(user, package):
     if not isinstance(user, User):
         return False
     total = PackageNotification.objects.filter(user=user,
-        package=package_pk).count()
+        package=package).count()
     return total != 0
 
 @register.filter

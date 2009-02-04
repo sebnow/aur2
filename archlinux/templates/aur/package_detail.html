@@ -9,7 +9,7 @@
     <div style="float:right" class="listing">
         <ul class="small">
             <li>
-                {% if user|has_update_notification:pkg.name %}
+                {% if user|has_update_notification:pkg %}
                 <a href="{% url aur-denotify_of_updates object_id=pkg.name %}">{% trans "Stop notifying me of updates" %}</a>
                 {% else %}
                 <a href="{% url aur-notify_of_updates object_id=pkg.name %}">{% trans "Notify me of updates" %}</a></li>
