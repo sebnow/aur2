@@ -1,13 +1,11 @@
 import tarfile
 import os
-from parched import PKGBUILD
 
 from django import forms
 from django.core.files import File
 
-from aur.models import *
-from pkgbuild import PKGBUILDValidator
-
+from aur.models import Package
+from pkgbuild import PKGBUILDValidator, PackageUploader
 
 class PackageSearchForm(forms.Form):
     # Borrowed from AUR2-BR
@@ -78,20 +76,9 @@ class PackageField(forms.FileField):
         fileobj = None
         cleaned_file = super(PackageField, self).clean(data, initial)
         errors = []
-        # Get the PKGBUILD out of the tarball if one was uploaded
-        # try:
-        #     tarfileobj = tarfile.open(fileobj=cleaned_file)
-        #     found = False
-        #     for name in tarfileobj.getnames():
-        #         if name.find("PKGBUILD") >= 0:
-        #             found = True
-        #             fileobj = tarfileobj.extractfile(name)
-        #     if not found:
-        #         tarfileobj.close()
-        #         raise forms.ValidationError("PKGBUILD could not be found in tarball")
-        # except tarfile.ReadError:
-        #     fileobj = cleaned_file
-        fileobj = cleaned_file
+        fileobj = _pkgbuild_from_tarball(cleaned_file)
+        if fileobj is None:
+            raise forms.ValidationError("PKGBUILD could not be found in tarball")
         package = PKGBUILD(fileobj=fileobj)
         validator = PKGBUILDValidator(package)
         validator.validate()
@@ -128,134 +115,21 @@ class PackageSubmitForm(forms.Form):
         repo_choices = [(repo.name.lower(), repo.name) for repo in Repository.objects.all()]
         self.fields['repository'].choices = repo_choices
 
-    #@transaction.commit_manually
     def save(self, user):
         if not self.is_valid():
             return
         import hashlib
-        cleaned_file = self.cleaned_data['package']
-        # PKGBUILD's file-like object
-        fileobj = None
+        fileobj = self.cleaned_data['package']
         tarfileobj = None
-        # try:
-        #     tarfileobj = tarfile.open(fileobj=cleaned_file)
-        #     for name in tarfileobj.getnames():
-        #         if name.find("PKGBUILD") >= 0:
-        #             fileobj = tarfileobj.extractfile(name)
-        # except tarfile.ReadError:
-        #     fileobj = cleaned_file
-        fileobj = cleaned_file
-        pkgbuild = PKGBUILD(fileobj=fileobj)
-        updating = False
         try:
-            package = Package.objects.get(name=pkgbuild.name)
-            updating = True
-        except Package.DoesNotExist:
-            package = Package(name=pkgbuild.name)
-        self._save_metadata(package, pkgbuild, updating)
-        # Remove all sources. It's easier and cleaner this way.
-        if updating:
-            PackageFile.objects.filter(package=package.name).delete()
-            package.tarball.delete()
-        # Hash and save PKGBUILD
-        source = PackageFile(package=package)
-        source.filename.save('%(name)s/sources/PKGBUILD', fileobj)
-        source.save()
-        fileobj.seek(0)
-        digest = hashlib.md5("\n".join(fileobj.readlines())).hexdigest()
-        fileobj.seek(0)
-        PackageHash(hash=digest, file=source, type='md5').save()
-        if tarfileobj is None:
-            tarfileobj = self._tarfile_from_pkgbuild(fileobj, package.name)
-        else:
-            self._save_files(package, pkgbuild, tarfileobj)
-        transaction.commit()
-
-    def _save_metadata(self, package, pkgbuild, updating):
-        package.version = pkgbuild.version
-        package.release = pkgbuild.release
-        package.description = pkgbuild.description
-        package.url = pkgbuild.url
-        repository = self.cleaned_data['repository']
-        package.repository=Repository.objects.get(name__iexact=repository)
-        # Save the package so we can reference it
+            tarfileobj = tarfile.open(fileobj=fileobj)
+        except tarfile.ReadError:
+            tarfileobj = self._tarfile_from_pkgbuild(fileobj)
+        package = PackageUploader(tarfileobj, self.cleaned_data['repository'])
         package.save()
-        # Implicitely add uploader as the maintainer
-        if not updating:
-            package.maintainers.add(user)
-        else:
-            # TODO: Check if user can upload/overwrite the package
-            pass
-        # Check for, and add dependencies
-        for dependency in pkgbuild.depends:
-            try:
-                package.depends.add(Package.objects.get(name=dependency))
-            except Package.DoesNotExist:
-                # Ignore external dependencies
-                pass
-        # Add provides
-        for provision in pkgbuild.provides:
-            p, created = Provision.objects.get_or_create(name=provision)
-            package.provides.add(p)
-        # Add licenses
-        for license in pkgbuild.licenses:
-            l, created = License.objects.get_or_create(name=license)
-            package.licenses.add(l)
-        # Add architectures
-        for arch in pkgbuild.architectures:
-            a = Architecture.objects.get(name=arch)
-            package.architectures.add(a)
+        tarfileobj.close()
 
-    def _save_files(self, package, pkgbuild, tarfileobj):
-        # Save tarball
-        # TODO: Tar the saved sources instead of using the uploaded one, for
-        # security
-        path = os.path.join('%(name)s', package.name + 'tar.gz')
-        package.tarball.save(path, File(open(tarfileobj.name, "rb")))
-        # Save source files
-        names = tarfileobj.getnames()
-        for index, source_filename in pkgbuild.sources:
-            source = PackageFile(package=package)
-            # If it's a local file, save to disk, otherwise record as url
-            if tarfileobj:
-                found = False
-                fp = None
-                for name in names:
-                    if name.find(source_filename) >= 0:
-                        fp = tarfileobj.extractfile(name)
-                        found = True
-                        break
-                if found:
-                    source.filename.save('%(name)s/sources/' + source_filename, fp)
-                    fp.close()
-                else:
-                    source.url = source_filename
-            else:
-                # TODO: Check that it _is_ a url, otherwise report an error
-                # that files are missing
-                source.url = source_filename
-            source.save()
-            # Check for, and save, any hashes this file may have
-            for hash_type in pkgbuild.checksums:
-                if pkgbuild.checksums[hash_type]:
-                    PackageHash(hash=pkgbuild.checksums[hash_type][index],
-                            file=source, type=hash_type).save()
-        # Save install files
-        source = PackageFile(package=package)
-        if pkgbuild.install:
-            names = tarfileobj.getnames()
-            path = os.path.join(package.name, pkgbuild.install)
-            install = None
-            if path in names:
-                install = tarfileobj.extractfile(path)
-            else:
-                install = tarfileobj.extractfile(pkgbuild.install)
-            source.filename.save('%(name)s/sources/' + pkgbuild.install, install)
-            instal.close()
-            source.save()
-        transaction.commit()
-
-    def _tarfile_from_pkgbuild(self, fileobj, name):
+    def _tarfile_from_pkgbuild(self, fileobj):
         """Create a tarball in a temporary directory, containing *fileobj*.
         
         .. note::
@@ -263,12 +137,15 @@ class PackageSubmitForm(forms.Form):
             The returned :class:`TarFile` object is open for reading.
         """
         import tempfile
-        tarball_name = name + '.tar.gz'
-        tarball_path = os.path.join(tempfile.mkdtemp(), tarball_name)
+        tarball_path = os.path.join(tempfile.mkdtemp(), 'tmp.tar.gz')
         # TODO: Is there a way to add the fileobj to the tarfile from memory?
         pkgbuild_path = os.path.join(tempfile.mkdtemp(), "PKGBUILD")
         pkgbuild = open(pkgbuild_path, "w")
+        if hasattr(fileobj):
+            fileobj.seek(0)
         pkgbuild.writelines(fileobj.readlines())
+        if hasattr(fileobj):
+            fileobj.seek(0)
         pkgbuild.close()
         tarfileobj = tarfile.open(str(tarball_path), "w|gz")
         tarfileobj.add(pkgbuild_path, os.path.join(name, "PKGBUILD"))

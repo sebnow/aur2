@@ -81,6 +81,7 @@ class Package(models.Model):
     tags = TagField()
     slug = models.SlugField(editable=False)
     tarball = models.FileField(upload_to=_get_package_upload_to)
+    install = models.FileField(upload_to=_get_package_upload_to)
     licenses = models.ManyToManyField(License, null=True, blank=True)
     architectures = models.ManyToManyField(Architecture)
     depends = models.ManyToManyField('self', null=True, blank=True,
