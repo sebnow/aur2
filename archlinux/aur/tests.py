@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files import File
 from django.contrib.auth import authenticate
+from django.core.files.storage import default_storage as storage
 
 from aur.forms import PackageSearchForm, PackageSubmitForm
 from aur.models import Package, PackageNotification, Repository, PackageFile
@@ -48,6 +49,7 @@ class AurViewTests(AurTestCase):
             'slug': 'DoesNotExist',
         }))
         self.assertEqual(response.status_code, 404)
+
 
 class AurAPITests(AurTestCase):
     def test_search_view(self):
@@ -93,6 +95,7 @@ class AurModelTests(AurTestCase):
         # and its removal is attempted
         self.assertEquals(len(mail.outbox), 1)
 
+
 class AurSearchFormTests(AurTestCase):
     def test_search_form(self):
         form = PackageSearchForm(data={
@@ -103,11 +106,9 @@ class AurSearchFormTests(AurTestCase):
         self.assertEquals(results.count(), 1)
         self.assertEquals(results[0].name, 'unique_package')
 
+
 class AurSubmitFormTests(AurTestCase):
     def setUp(self):
-        import tempfile
-        self._media_root = settings.MEDIA_ROOT
-        settings.MEDIA_ROOT = tempfile.mkdtemp()
         self.fileobj = SimpleUploadedFile('PKGBUILD', """
             pkgname="new_package"
             pkgver=1.0
@@ -128,29 +129,45 @@ class AurSubmitFormTests(AurTestCase):
         self.user = authenticate(username="normal_user", password="normal_user")
 
     def tearDown(self):
-        settings.MEDIA_ROOT = self._media_root
         self.fileobj.close()
 
     def test_validate_sane(self):
         self.assertTrue(self.form.is_valid(), "valid package did not validate:\n%r" % self.form.errors)
 
-    def test_submit_save_plain(self):
-        import os
+    def test_save_plain(self):
         self.form.save(self.user)
         package = None
         try:
             package = Package.objects.get(name="new_package")
         except Package.DoesNotExist:
             self.fail("package was not saved to the database")
-        self.assertTrue(os.path.exists(package.tarball.path))
+        self.assertTrue(storage.exists(package.tarball.path))
         found = False
         # FIXME: This is stupid
         for f in PackageFile.objects.filter(package=package):
             if f.filename and f.filename.name.find("PKGBUILD") >= 0:
                 found = True
-                self.assertTrue(os.path.exists(f.filename.path))
+                self.assertTrue(storage.exists(f.filename.path))
         self.assertTrue(found, "PKGBUILD was not uploaded")
-        self.assertTrue(os.path.exists(package.tarball.path))
+        self.assertTrue(storage.exists(package.tarball.path))
+
+    def test_save_tarball(self):
+        import tempfile
+        import tarfile
+        import os
+        tarfileobj = tarfile.open(os.path.join(tempfile.mkdtemp(), "new_package.tar"), "w")
+        path = os.path.join(tempfile.mkdtemp(), "PKGBUILD")
+        fp = open(path, "w")
+        fp.writelines(self.fileobj.readlines())
+        fp.close()
+        tarfileobj.add(path, "PKGBUILD")
+        self.form.save(self.user)
+        package = None
+        try:
+            package = Package.objects.get(name="new_package")
+        except Package.DoesNotExist:
+            self.fail("package was not saved to the database")
+        self.assertTrue(storage.exists(package.tarball.path))
 
 
 class AurTemplateTagTests(AurTestCase):
