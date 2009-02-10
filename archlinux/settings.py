@@ -1,7 +1,9 @@
+import os.path
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-DEPLOY_PATH = '' # This is the base dir for everything
+DEPLOY_PATH = os.path.dirname(__file__) # This is the base dir for everything
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
@@ -9,12 +11,12 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = ''           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = ''             # Or path to database file if using sqlite3.
-DATABASE_USER = ''             # Not used with sqlite3.
-DATABASE_PASSWORD = ''         # Not used with sqlite3.
-DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+DATABASE_ENGINE = 'sqlite3'
+DATABASE_NAME = 'database.sqlite3'
+DATABASE_USER = ''
+DATABASE_PASSWORD = ''
+DATABASE_HOST = ''
+DATABASE_PORT = ''
 
 TIME_ZONE = 'America/Chicago'
 
@@ -25,8 +27,8 @@ SITE_ID = 1
 USE_I18N = True
 
 # Absolute path to the directory that holds media.
-MEDIA_ROOT = '/home/media/media.example.com/'
-MEDIA_URL = 'http://example.com/media/'
+MEDIA_ROOT = os.path.join(DEPLOY_PATH, 'media')
+MEDIA_URL = 'http://localhost:8000/media/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -51,11 +53,11 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'archlinux.urls'
 
 TEMPLATE_DIRS = (
-    DEPLOY_PATH + '/templates',
+    os.path.join(DEPLOY_PATH, 'templates'),
 )
 
 FIXTURE_DIRS = (
-    DEPLOY_PATH + '/fixtures',
+    os.path.join(DEPLOY_PATH, 'fixtures'),
 )
 
 INSTALLED_APPS = (
@@ -73,3 +75,9 @@ INSTALLED_APPS = (
 
 # django-registration
 ACCOUNT_ACTIVATION_DAYS = 1
+
+# Import local settings if they exist
+try:
+    from settings_local import *
+except ImportError:
+    pass

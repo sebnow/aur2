@@ -29,33 +29,11 @@ such::
 Configuration
 =============
 
-After all dependencies have been installed the ``settings.py`` file should be
-configured, a prototype has been provided as ``settings.py.proto``. For
-development purposes, the most important settings are related to the database.
-Typically ``sqlite3`` would be used, e.g.::
-
-    DATABASE_ENGINE = 'sqlite3'
-    DATABASE_NAME = 'database.sqlite3'
-    # These variables can be left blank
-    DATABASE_USER = ''
-    DATABASE_PASSWORD = ''
-    DATABASE_HOST = ''
-    DATABASE_PORT = ''
-
-The *DEPLOY_PATH* should be set. For development purposes this can be the
-project directory::
-
-    import os
-    DEPLOY_PATH = os.path.dirname(__file__)
-
-Finally the last required variables are *MEDIA_ROOT*, *MEDIA_URL* and
-*ADMIN_MEDIA_PREFIX*. *MEDIA_ROOT* can also take advantage of *DEPLOY_PATH*::
-
-    MEDIA_ROOT = os.path.join(DEPLOY_PATH, 'media')
-
-The *MEDIA_URL* should point to ``/media/``. Using the Django dev server, this would be::
-
-    MEDIA_URL = 'http://localhost:8000/media/'
+After all dependencies have been installed the ``settings_local.py``
+file should be configured, a prototype has been provided as
+``settings_local.py.sample``. The default ``settings.py`` file has
+defaults targeted for a development environment. On a production system
+at least the settings in ``settings_local.py.sample`` should configured.
 
 The *ADMIN_MEDIA_PREFIX* is only required if the admin app is used. It can be
 left as is, but MEDIA_URL would have to to be changed. The suggested

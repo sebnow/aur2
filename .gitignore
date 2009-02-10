@@ -1,2 +1,2 @@
-archlinux/settings.py
+archlinux/settings_local.py
 *.pyc
