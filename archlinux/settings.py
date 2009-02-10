@@ -69,12 +69,16 @@ INSTALLED_APPS = (
     'archlinux.aur',
     'registration',
     'aurprofile',
+    'tagging',
 )
 
 # Third party settings
 
 # django-registration
 ACCOUNT_ACTIVATION_DAYS = 1
+
+# django-tagging
+FORCE_LOWERCASE_TAGS = True
 
 # Import local settings if they exist
 try:
