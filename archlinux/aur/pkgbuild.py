@@ -3,6 +3,8 @@ import hashlib
 import tempfile
 from parched import PKGBUILD
 
+from django.db import transaction
+
 from archlinux.aur.models import Package, PackageHash, PackageFile
 
 class PKGBUILDValidator(object):
@@ -72,10 +74,10 @@ class PKGBUILDValidator(object):
             checksum = self._package.checksums[algorithm]
             if checksum:
                 found_sums = True
-            if len(checksum) != len(self._package.sources):
-                self._errors.append('amount of %ssums '
-                    'and sources does not match' % algorithm
-                )
+                if len(checksum) != len(self._package.sources):
+                    self._errors.append('amount of %ssums '
+                        'and sources does not match' % algorithm
+                    )
         if self._package.sources and not found_sums:
             self._errors.append('sources exist without checksums')
 
@@ -95,7 +97,7 @@ class PackageUploader(object):
                 break;
         if self.pkgbuild is None:
             raise ValueError("PKGBUILD not found in tarfile")
-        if not self.pkgbuild.is_valid;
+        if not self.pkgbuild.is_valid:
             raise ValueError("PKGBUILD has to be valid")
 
     @transaction.commit_manually

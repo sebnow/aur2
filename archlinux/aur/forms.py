@@ -1,10 +1,11 @@
 import tarfile
 import os
+from parched import PKGBUILD
 
 from django import forms
 from django.core.files import File
 
-from aur.models import Package
+from aur.models import Package, Repository, Architecture
 from pkgbuild import PKGBUILDValidator, PackageUploader
 
 class PackageSearchForm(forms.Form):
@@ -76,7 +77,23 @@ class PackageField(forms.FileField):
         fileobj = None
         cleaned_file = super(PackageField, self).clean(data, initial)
         errors = []
-        fileobj = _pkgbuild_from_tarball(cleaned_file)
+        # If cleaned_file is a tarfile, extract the PKGBUILD, otherwise
+        # assume cleaned_file is the PKGBUILD
+        try:
+            tarfileobj = tarfile.open(fileobj=cleaned_file)
+            found = False
+            for name in tarfileobj.getnames():
+                if name.find("PKGBUILD") >= 0:
+                    found = True
+                    fileobj = tarfileobj.extractfile(name)
+                    break
+            if not found:
+                tarfileobj.close()
+                raise forms.ValidationError("PKGBUILD could not be found in the tarball")
+            tarfileobj.close()
+            del tarfileobj
+        except tarfile.ReadError:
+            fileobj = cleaned_file
         if fileobj is None:
             raise forms.ValidationError("PKGBUILD could not be found in tarball")
         package = PKGBUILD(fileobj=fileobj)
@@ -124,34 +141,34 @@ class PackageSubmitForm(forms.Form):
         try:
             tarfileobj = tarfile.open(fileobj=fileobj)
         except tarfile.ReadError:
-            tarfileobj = self._tarfile_from_pkgbuild(fileobj)
+            tarfileobj = _tarfile_from_pkgbuild(fileobj)
         package = PackageUploader(tarfileobj, self.cleaned_data['repository'])
         package.save()
         tarfileobj.close()
 
-    def _tarfile_from_pkgbuild(self, fileobj):
-        """Create a tarball in a temporary directory, containing *fileobj*.
-        
-        .. note::
-        
-            The returned :class:`TarFile` object is open for reading.
-        """
-        import tempfile
-        tarball_path = os.path.join(tempfile.mkdtemp(), 'tmp.tar.gz')
-        # TODO: Is there a way to add the fileobj to the tarfile from memory?
-        pkgbuild_path = os.path.join(tempfile.mkdtemp(), "PKGBUILD")
-        pkgbuild = open(pkgbuild_path, "w")
-        if hasattr(fileobj):
-            fileobj.seek(0)
-        pkgbuild.writelines(fileobj.readlines())
-        if hasattr(fileobj):
-            fileobj.seek(0)
-        pkgbuild.close()
-        tarfileobj = tarfile.open(str(tarball_path), "w|gz")
-        tarfileobj.add(pkgbuild_path, os.path.join(name, "PKGBUILD"))
-        tarfileobj.close()
-        os.remove(pkgbuild_path)
-        os.rmdir(os.path.dirname(pkgbuild_path))
-        tarfileobj = tarfile.open(str(tarball_path), "r")
-        return tarfileobj
 
+def _tarfile_from_pkgbuild(fileobj):
+    """Create a tarball in a temporary directory, containing *fileobj*.
+
+    .. note::
+
+        The returned :class:`TarFile` object is open for reading.
+    """
+    import tempfile
+    tarball_path = os.path.join(tempfile.mkdtemp(), 'tmp.tar.gz')
+    # TODO: Is there a way to add the fileobj to the tarfile from memory?
+    pkgbuild_path = os.path.join(tempfile.mkdtemp(), "PKGBUILD")
+    pkgbuild = open(pkgbuild_path, "w")
+    if hasattr(fileobj):
+        fileobj.seek(0)
+    pkgbuild.writelines(fileobj.readlines())
+    if hasattr(fileobj):
+        fileobj.seek(0)
+    pkgbuild.close()
+    tarfileobj = tarfile.open(str(tarball_path), "w|gz")
+    tarfileobj.add(pkgbuild_path, os.path.join(name, "PKGBUILD"))
+    tarfileobj.close()
+    os.remove(pkgbuild_path)
+    os.rmdir(os.path.dirname(pkgbuild_path))
+    tarfileobj = tarfile.open(str(tarball_path), "r")
+    return tarfileobj
