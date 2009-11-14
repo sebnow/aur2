@@ -1,8 +1,5 @@
 import os.path
 
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
-
 DEPLOY_PATH = os.path.dirname(__file__) # This is the base dir for everything
 
 ADMINS = (
@@ -10,13 +7,6 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
-
-DATABASE_ENGINE = 'sqlite3'
-DATABASE_NAME = 'database.sqlite3'
-DATABASE_USER = ''
-DATABASE_PASSWORD = ''
-DATABASE_HOST = ''
-DATABASE_PORT = ''
 
 TIME_ZONE = 'America/Chicago'
 
