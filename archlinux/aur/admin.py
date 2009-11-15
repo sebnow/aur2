@@ -1,4 +1,4 @@
-from archlinux.aur.models import *
+from aur.models import *
 from django.contrib import admin
 
 admin.site.register(Architecture)

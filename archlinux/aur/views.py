@@ -13,8 +13,8 @@ from django.core.urlresolvers import reverse
 from django.core import serializers
 from django.utils.translation import ugettext
 
-from archlinux.aur.models import *
-from archlinux.aur.forms import PackageSearchForm, PackageSubmitForm
+from aur.models import *
+from aur.forms import PackageSearchForm, PackageSubmitForm
 
 # Helper functions for permissions
 # This should perhaps be elsewhere. In the future Django may support

@@ -41,7 +41,7 @@
                     <li><a href="http://archlinux.org/mailman/listinfo/aur-general">{% trans "Mailing List" %}</a></li>
                     <li><a href="http://bugs.archlinux.org/index.php?tasks=all&amp;project=2">{% trans "Bugs" %}</a></li>
                     {% if user.is_authenticated %}
-                    <li><a href="{% url archlinux.aur.views.submit %}">{% trans "Submit" %}</a></li>
+                    <li><a href="{% url aur.views.submit %}">{% trans "Submit" %}</a></li>
                     {% endif %}
                     <li><a href="/">{% trans "Packages" %}</a></li>
                 </ul>
