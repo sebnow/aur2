@@ -105,7 +105,7 @@
     <p class="news">{{ comment.message }}</p>
     <br />
     <div style="text-align:right">
-    <form action="{% url archlinux.aur.views.comment object_id=pkg.name %}" method="post">
+    <form action="{% url aur.views.comment object_id=pkg.name %}" method="post">
             <input type="hidden" name="reply_to" value="{{ comment.id }}" />
             <input type="submit" value="{% trans "Reply" %}" />
         </form>
@@ -117,7 +117,7 @@
 <br />
 <h2 class="title">{% trans "Post comment" %}</h2>
 <div class="greybox" style="text-align:right">
-    <form action="{% url archlinux.aur.views.comment object_id=pkg.name %}" method="post">
+    <form action="{% url aur.views.comment object_id=pkg.name %}" method="post">
         <textarea name="message" style="width:100%;" rows="10"></textarea><br />
         <input type="submit" value="{% trans "Reply" %}" />
     </form>

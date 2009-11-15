@@ -1,8 +1,8 @@
 from django import forms
 from django.core.files import File
 
-from archlinux.aur.models import *
-import archlinux.aur.Package as PKGBUILD
+from aur.models import *
+import aur.Package as PKGBUILD
 
 import os
 import sys

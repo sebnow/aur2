@@ -1,12 +1,12 @@
 from django.conf.urls.defaults import *
-from archlinux.aur.models import Package
+from aur.models import Package
 
 detail_dict = {
     'queryset': Package.objects.all(),
     'template_object_name': 'pkg',
 }
 
-urlpatterns = patterns('archlinux.aur.views',
+urlpatterns = patterns('aur.views',
     url(r'^$', 'search', name='aur-main'),
     url(r'^search/$', 'search', name='aur-search'),
     url(r'^submit/$', 'submit', name='aur-submit_package'),

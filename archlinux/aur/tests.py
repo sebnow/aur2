@@ -47,21 +47,21 @@ class AurViewTests(AurTestCase):
 
 class AurAPITests(AurTestCase):
     def test_search_view(self):
-        response = self.client.get(reverse('archlinux.aur.views.api_search', kwargs={
+        response = self.client.get(reverse('aur.views.api_search', kwargs={
             'query': 'package',
             'format': 'json',
         }))
         self.assertEqual(response.status_code, 200)
 
     def test_package_view(self):
-        response = self.client.get(reverse('archlinux.aur.views.api_package_info', kwargs={
+        response = self.client.get(reverse('aur.views.api_package_info', kwargs={
             'object_id' :'unique_package',
             'format': 'json',
         }))
         self.assertEqual(response.status_code, 200)
 
         # Requested package does not exist (404)
-        response = self.client.get(reverse('archlinux.aur.views.api_package_info', kwargs={
+        response = self.client.get(reverse('aur.views.api_package_info', kwargs={
             'object_id' :'DoesNotExist',
             'format': 'json',
         }))

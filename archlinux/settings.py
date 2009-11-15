@@ -56,7 +56,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.admin',
     'django.contrib.sites',
-    'archlinux.aur',
+    'aur',
     'registration',
     'aurprofile',
     'tagging',

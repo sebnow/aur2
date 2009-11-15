@@ -1,7 +1,7 @@
 from django.template import Library
 from django.template.defaultfilters import stringfilter
 from django.contrib.auth.models import User
-from archlinux.aur.models import Package, PackageNotification
+from aur.models import Package, PackageNotification
 import re
 
 register = Library()

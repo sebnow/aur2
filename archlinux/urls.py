@@ -8,7 +8,7 @@ urlpatterns = patterns('',
     (r'^admin/(.*)', admin.site.root),
     (r'^accounts/', include('registration.urls')),
     (r'^profile/', include('aurprofile.urls')),
-    (r'^', include('archlinux.aur.urls')),
+    (r'^', include('aur.urls')),
 )
 
 if settings.DEBUG == True:
