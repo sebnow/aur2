@@ -1,14 +1,14 @@
-# Polish translation
-# Copyright (C) 2007 Sebastian Nowicki
+# Deustch translation
+# Copyright (C) 2009 Patryk Pasierbski
 # This file is distributed under the same license as the AUR package.
-# Sebastian Nowicki <xilonmu@gmail>, 2007
+# Patryk Paserbski <SpeedVin<dot>archlinux<at>us>, 2009
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-10-04 18:08+0800\n"
+"POT-Creation-Date: 2009-1xi10-21 10:30+0800\n"
 "PO-Revision-Date: 2009-11-19 22:02+0800\n"
 "Last-Translator: Patryk Pasierbski <SpeedVin<dot>archlinux<at>us>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -34,11 +34,11 @@ msgstr "Wiki"
 
 #: templates/base.html:32
 msgid "Forums"
-msgstr "Dyskusja"
+msgstr "Diskussion"
 
 #: templates/base.html:33
 msgid "Home"
-msgstr "Dom"
+msgstr "Haus"
 
 #: templates/base.html:40
 msgid "Statistics"
@@ -66,7 +66,7 @@ msgstr "Repozytorium"
 
 #: templates/aur/package_archive.html:7
 msgid "Name"
-msgstr "Imie"
+msgstr "Vorname"
 
 #: templates/aur/package_archive.html:8 templates/aur/package_detail.html:19
 msgid "Description"
