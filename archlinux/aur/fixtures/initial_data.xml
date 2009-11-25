@@ -6,6 +6,9 @@
     <object pk="2" model="aur.architecture">
         <field type="CharField" name="name">x86_64</field>
     </object>
+    <object pk="3" model="aur.architecture">
+        <field type="CharField" name="name">any</field>
+    </object>
     <object pk="1" model="aur.license">
         <field type="CharField" name="name">APACHE</field>
     </object>
