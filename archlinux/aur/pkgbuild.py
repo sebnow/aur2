@@ -7,9 +7,9 @@ from django.db import transaction
 
 from archlinux.aur.models import Package, PackageHash, PackageFile
 
-class PKGBUILDValidator(object):
-    def __init__(self, package):
-        self._package = package
+class ValidPKGBUILD(PKGBUILD):
+    def __init__(self, name=None, fileobj=None):
+        super(ValidPKGBUILD, self).__init__(name, fileobj)
         self._is_valid = None
         self._errors = None
         self._warnings = None
@@ -21,6 +21,7 @@ class PKGBUILDValidator(object):
             'licenses',
             'architectures',
         )
+
     @property
     def is_valid(self):
         """
@@ -46,7 +47,6 @@ class PKGBUILDValidator(object):
             self.validate()
         return self._warnings
 
-
     def validate(self):
         """
         Validate PKGBUILD for missing or invalid fields
@@ -55,30 +55,30 @@ class PKGBUILDValidator(object):
         self._warnings = []
         # Search for missing fields
         for field in self._required_fields:
-            if not getattr(self._package, field):
+            if not getattr(self, field):
                 self._errors.append(field + ' field is required')
         # Validate name
-        if not re.match("^[\w\d_-]+$", self._package.name):
+        if not re.match("^[\w\d_-]+$", self.name):
             self._errors.append('name must be alphanumeric')
         # Furthur validate name to be more specific with error messages
-        elif not re.match("[a-z\d_-]+", self._package.name):
+        elif not re.match("[a-z\d_-]+", self.name):
             self._warnings.append('name should be in lower case')
-        if self._package.version.find('-') >= 0:
+        if self.version.find('-') >= 0:
             self._errors.append('version is not allowed to contain hyphens')
         # Description isn't supposed to be longer than 80 characters
-        if self._package.description and len(self._package.description) > 80:
+        if self.description and len(self.description) > 80:
             self._warnings.append("description should't exceed 80 characters")
         # Make sure the number of sources and checksums is the same
         found_sums = False
-        for algorithm in self._package.checksums:
-            checksum = self._package.checksums[algorithm]
+        for algorithm in self.checksums:
+            checksum = self.checksums[algorithm]
             if checksum:
                 found_sums = True
-                if len(checksum) != len(self._package.sources):
+                if len(checksum) != len(self.sources):
                     self._errors.append('amount of %ssums '
                         'and sources does not match' % algorithm
                     )
-        if self._package.sources and not found_sums:
+        if self.sources and not found_sums:
             self._errors.append('sources exist without checksums')
 
 

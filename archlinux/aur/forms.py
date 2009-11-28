@@ -1,12 +1,11 @@
 import tarfile
 import os
-from parched import PKGBUILD
 
 from django import forms
 from django.core.files import File
 
 from aur.models import Package, Repository, Architecture
-from pkgbuild import PKGBUILDValidator, PackageUploader
+from pkgbuild import ValidPKGBUILD, PackageUploader
 
 class PackageSearchForm(forms.Form):
     # Borrowed from AUR2-BR
@@ -96,11 +95,10 @@ class PackageField(forms.FileField):
             fileobj = cleaned_file
         if fileobj is None:
             raise forms.ValidationError("PKGBUILD could not be found in tarball")
-        package = PKGBUILD(fileobj=fileobj)
-        validator = PKGBUILDValidator(package)
-        validator.validate()
-        errors.extend(validator.errors)
-        errors.extend(validator.warnings)
+        package = ValidPKGBUILD(fileobj=fileobj)
+        package.validate()
+        errors.extend(package.errors)
+        errors.extend(package.warnings)
         # Check if we have everything we need
         for arch in package.architectures:
             try:
