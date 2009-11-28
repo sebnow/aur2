@@ -1,7 +1,7 @@
 from django.template import Library
 from django.template.defaultfilters import stringfilter
 from django.contrib.auth.models import User
-from aur.models import Package, PackageNotification
+from aur.models import Package, PackageNotification, Vote
 import re
 
 register = Library()
@@ -12,6 +12,13 @@ def has_update_notification(user, package):
         return False
     total = PackageNotification.objects.filter(user=user,
         package=package).count()
+    return total != 0
+
+@register.filter
+def has_vote(user, package):
+    if not isinstance(user, User):
+        return False
+    total = Vote.objects.filter(user=user, package=package).count()
     return total != 0
 
 @register.filter

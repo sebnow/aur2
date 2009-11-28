@@ -1,5 +1,6 @@
 from django.db import models
 from django.db import transaction
+from django.db import IntegrityError
 from django.contrib.auth.models import User
 from django.core.mail import send_mass_mail
 from django.db.models import signals, permalink
@@ -181,6 +182,18 @@ class PackageNotification(models.Model):
     def __unicode__(self):
         return u"%s's subscription to %s updates" % (self.user.username,
                 self.package.name)
+
+
+class Vote(models.Model):
+    user = models.ForeignKey(User)
+    package = models.ForeignKey(Package)
+    added = models.DateTimeField(default=datetime.now)
+
+    def __unicode__(self):
+        return u"%s's vote for %s" % (self.user.username, self.package.name)
+
+    class Meta:
+        unique_together = (("user", "package"),)
 
 
 # Should this be here?

@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
@@ -5,7 +6,7 @@ from django.core import mail
 from django.template import Template, Context
 
 from aur.forms import PackageSearchForm
-from aur.models import Package, PackageNotification
+from aur.models import Package, PackageNotification, Vote
 
 class AurTestCase(TestCase):
     fixtures = ['test/users', 'test/packages']
@@ -41,6 +42,43 @@ class AurViewTests(AurTestCase):
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(reverse('aur-package_detail', kwargs={
+            'slug': 'DoesNotExist',
+        }))
+        self.assertEqual(response.status_code, 404)
+
+    def test_vote_view(self):
+        user = User.objects.get(username='normal_user')
+        package = Package.objects.get(name='unique_package')
+        self.client.login(username=user.username, password='normal_user')
+        response = self.client.get(reverse('aur-vote', kwargs={
+            'slug': package.slug,
+        }))
+        self.assertRedirects(response, reverse('aur-package_detail', kwargs={
+            'slug': package.slug,
+        }))
+        self.assertEqual(user.vote_set.count(), 1)
+        self.assertEqual(package.vote_set.count(), 1)
+        response = self.client.get(reverse('aur-vote', kwargs={
+            'slug': 'DoesNotExist',
+        }))
+        self.assertEqual(response.status_code, 404)
+        # Make sure that we didn't count a vote for a nonexistent package...
+        self.assertEqual(user.vote_set.count(), 1)
+
+    def test_unvote_view(self):
+        package = Package.objects.get(name='unique_package')
+        user = User.objects.get(username='normal_user')
+        Vote(package=package, user=user).save()
+        self.client.login(username=user.username, password='normal_user')
+        response = self.client.get(reverse('aur-unvote', kwargs={
+            'slug': package.slug,
+        }))
+        self.assertRedirects(response, reverse('aur-package_detail', kwargs={
+            'slug': package.slug,
+        }))
+        self.assertEqual(package.vote_set.count(), 0)
+        self.assertEqual(user.vote_set.count(), 0)
+        response = self.client.get(reverse('aur-unvote', kwargs={
             'slug': 'DoesNotExist',
         }))
         self.assertEqual(response.status_code, 404)
@@ -118,5 +156,24 @@ class AurTemplateTagTests(AurTestCase):
         """)
         self.assertEquals(template.render(context).strip(), "False")
         PackageNotification(package=package, user=user).save()
+        self.assertEquals(template.render(context).strip(), "True")
+
+    def test_has_vote(self):
+        user = User.objects.get(username='normal_user')
+        package = Package.objects.get(name='unique_package')
+        context = Context({
+            'user': user,
+            'package': package,
+        })
+        template = Template("""
+            {% load aur_tags %}
+            {% if user|has_vote:package %}
+                True
+            {% else %}
+                False
+            {% endif %}
+        """)
+        self.assertEquals(template.render(context).strip(), "False")
+        Vote(package=package, user=user).save()
         self.assertEquals(template.render(context).strip(), "True")
 

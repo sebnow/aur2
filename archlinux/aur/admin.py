@@ -11,4 +11,4 @@ admin.site.register(PackageHash)
 admin.site.register(PackageNotification)
 admin.site.register(Provision)
 admin.site.register(Repository)
-
+admin.site.register(Vote)

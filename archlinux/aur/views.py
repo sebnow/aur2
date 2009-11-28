@@ -5,8 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.core import serializers
 from django.utils.translation import ugettext
+from django.db import IntegrityError
 
-from aur.models import Package, Comment, PackageNotification
+from aur.models import Package, Comment, PackageNotification, Vote
 from aur.forms import PackageSearchForm, PackageSubmitForm
 
 # Helper functions for permissions
@@ -153,6 +154,26 @@ def denotify_of_updates(request, object_id):
     PackageNotification.objects.get(package__name=object_id, user=request.user).delete()
     return HttpResponseRedirect(reverse('aur-package_detail',
         args=[object_id,]))
+
+@login_required
+def vote(request, slug):
+    """Record a user's vote for a package"""
+    package = get_object_or_404(Package, slug=slug)
+    try:
+        Vote(package=package, user=request.user).save()
+    except IntegrityError: # Ignore the duplicate. Voter fraud not allowed!
+        pass # Should we complain?
+    return HttpResponseRedirect(reverse('aur-package_detail', args=[slug,]))
+
+@login_required
+def unvote(request, slug):
+    """Remove a user's vote for a package"""
+    package = get_object_or_404(Package, slug=slug)
+    try:
+        Vote.objects.get(package=package, user=request.user).delete()
+    except Vote.DoesNotExist:
+        pass
+    return HttpResponseRedirect(reverse('aur-package_detail', args=[slug,]))
 
 def api_search(request, query, format):
     results = Package.objects.filter(name__icontains=query)

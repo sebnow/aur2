@@ -9,6 +9,13 @@
     <div style="float:right" class="listing">
         <ul class="small">
             <li>
+                {% if user|has_vote:pkg %}
+                    <a href="{% url aur-unvote slug=pkg.slug %}">{% trans "Remove my vote" %}</a>
+                {% else %}
+                    <a href="{% url aur-vote slug=pkg.slug %}">{% trans "Vote for this package" %}</a>
+                {% endif %}
+            </li>
+            <li>
                 {% if user|has_update_notification:pkg %}
                 <a href="{% url aur-denotify_of_updates object_id=pkg.name %}">{% trans "Stop notifying me of updates" %}</a>
                 {% else %}
@@ -46,6 +53,9 @@
         </tr><tr>
             <th>{% trans "Maintainer" %}:</th>
             <td>{{ pkg.maintainers.all|join:", " }}</td>
+        </tr><tr>
+            <th>{% trans "Votes" %}:</th>
+            <td>{{ pkg.vote_set.count }}</td>
         </tr><tr>
             <th>{% trans "Last Updated" %}:</th>
             <td>{{ pkg.updated|date:"Y-m-d H:i:s" }}</td>
