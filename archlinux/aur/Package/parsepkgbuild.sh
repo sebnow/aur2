@@ -58,3 +58,4 @@ print_array sha1sums    "\${sha1sums[@]}"
 print_array sha256sums  "\${sha256sums[@]}"
 print_array sha384sums  "\${sha384sums[@]}"
 print_array sha512sums  "\${sha512sums[@]}"
+EOF
