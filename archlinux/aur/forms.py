@@ -230,12 +230,11 @@ class PackageSubmitForm(forms.Form):
             source_filename = pkg['source'][index]
             source = PackageFile(package=package)
             # If it's a local file, save to disk, otherwise record as url
-            if is_tarfile and os.path.exists(os.path.join(tmpdir_sources,
-               package.name, source_filename)):
-                    fp = File(open(os.path.join(tmpdir_sources, pkg['name'],
-                        source_filename), "r"))
-                    source.filename.save('%(name)s/sources/' + source_filename, fp)
-                    fp.close()
+            source_file = os.path.join(tmpdir_sources, package.name, source_filename)
+            if is_tarfile and os.path.exists(source_file):
+                fp = File(open(source_file, "r"))
+                source.filename.save('%(name)s/sources/' + source_filename, fp)
+                fp.close()
             else:
                 # TODO: Check that it _is_ a url, otherwise report an error
                 # that files are missing
