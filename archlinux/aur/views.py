@@ -141,6 +141,12 @@ def flag_out_of_date(request, object_id):
     package.save()
     return HttpResponseRedirect(package.get_absolute_url())
 
+def unflag_out_of_date(request, object_id):
+    package = get_object_or_404(Package, name=object_id)
+    package.outdated = False
+    package.save()
+    return HttpResponseRedirect(package.get_absolute_url())
+
 @login_required
 def notify_of_updates(request, object_id):
     """Subscribe a user to package updates"""
