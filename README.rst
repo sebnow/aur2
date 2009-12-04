@@ -20,6 +20,7 @@ Dependencies
 * `Django <http://www.djangoproject.com>`_ >= 1.0
 * `django-registration <http://bitbucket.org/ubernostrum/django-registration>`_
 * `django-tagging <http://code.google.com/p/django-tagging>`_
+* `django-openid-auth http://code.google.com/p/django-openid-auth/>`_
 
 If you use ``pip``, a ``pip-requirements.txt`` file is provided. It can be used as
 such::

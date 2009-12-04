@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     (r'^accounts/', include('registration.urls')),
     (r'^profile/', include('aurprofile.urls')),
     (r'^', include('aur.urls')),
+    (r'^openid/', include('django_openid_auth.urls')),
 )
 
 if settings.DEBUG == True:

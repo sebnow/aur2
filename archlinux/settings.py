@@ -56,11 +56,28 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.admin',
     'django.contrib.sites',
+    'django_openid_auth',
     'aur',
     'registration',
     'aurprofile',
     'tagging',
 )
+
+AUTHENTICATION_BACKENDS = (
+    'django_openid_auth.auth.OpenIDBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+# Should users be created when new OpenIDs are used to log in?
+OPENID_CREATE_USERS = True
+
+# When logging in again, should we overwrite user details based on
+# data received via Simple Registration?
+OPENID_UPDATE_DETAILS_FROM_SREG = True
+
+# Tell django.contrib.auth to use the OpenID signin URLs.
+LOGIN_URL = '/openid/login'
+LOGIN_REDIRECT_URL = '/'
 
 # Third party settings
 
