@@ -4,7 +4,7 @@
 
 <div class="greybox">
     <h2 class="title">{% trans "Login form" %}</h2>
-    {% if form.has_errors %}
+    {% if form.errors %}
     <p class="error">{% trans "Your username and password didn't match. Please try again." %}</p>
     {% endif %}
 
