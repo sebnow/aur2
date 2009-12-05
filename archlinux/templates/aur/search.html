@@ -46,7 +46,7 @@
                 <th><a href="{% url aur-search %}?sortby=name&order=desc">{% trans "Name" %}</a></th>
                 <th><a href="{% url aur-search %}?sortby=description&order=desc">{% trans "Description" %}</a></th>
                 <th>{% trans "Maintainer" %}</a></th>
-                <th style="width: 9em"><a href="{% url aur-search %}?sortby=lastupdated&order=desc">{% trans "Last Updated" %}</a></th>
+                <th style="width: 9em"><a href="{% url aur-search %}?sortby=updated&order=desc">{% trans "Last Updated" %}</a></th>
                 {% if is_moderator %}
                 <th>&nbsp;</th>
                 {% endif %}
