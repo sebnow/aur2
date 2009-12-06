@@ -2,6 +2,8 @@
 {% load i18n %}
 {% load aur_tags %}
 {% block search %}{% endblock %}
+{% block extra_head %} <link rel="alternate" type="application/rss+xml"
+href="/feeds/rss/packages" />{% endblock %}
 {% block content %}
 <div class="greybox">
     <h4 style="text-align: right">{% trans "Search Criteria" %}</h4>
