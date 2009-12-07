@@ -63,7 +63,14 @@
 <div class="greybox">
     <h3>{% trans "Account Details" %}</h3>
     <form method="post" action=".">
-        <table class="aurprofile_details">{% for field in form %}
+        <table class="aurprofile_details">
+            <tr>
+                <td>Registered: </td>
+                <td>
+                    {{ user.date_joined|date }}
+                </td>
+            </tr>
+            {% for field in form %}
             <tr>
                 <td>{{ field.label_tag }}: </td>
                 <td>
