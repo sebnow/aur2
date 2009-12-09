@@ -97,11 +97,12 @@
         </tr>
     </table>
 </div>
-{% ifnotequal pkg.comment_set.count 0 %}
+{%  with pkg.comment_set.all as comments %}
+{% if comments %}
 <br />
 <h2 class="title">{% trans "Comments" %}</h2>
 <div class="greybox">
-    {% for comment in pkg.comment_set.all %}
+    {% for comment in comments %}
     <span style="float:right; font-size:x-small">{{ comment.added|date }}
         {{ comment.added|time }}</span>
     <h4 class="news"><a href="#">{{ comment.user }}</a></h4>
@@ -116,7 +117,8 @@
     {% if not forloop.last %}<br />{% endif %}
     {% endfor %}
 </div>
-{% endifnotequal %}
+{% endif %}
+{% endwith %}
 <br />
 <h2 class="title">{% trans "Post comment" %}</h2>
 <div class="greybox" style="text-align:right">
