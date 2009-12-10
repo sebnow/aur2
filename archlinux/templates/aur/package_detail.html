@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load aur_tags %}
 {% load tagging_tags %}
+{% load comments %}
 {% block extra_title %} - {{ pkg.name }} {{ pkg.version }}-{{ pkg.release}}{% endblock %}
 {% block content %}
 <div class="box">
@@ -97,35 +98,34 @@
         </tr>
     </table>
 </div>
-{%  with pkg.comment_set.all as comments %}
+{% get_comment_list for pkg as comments %}
 {% if comments %}
 <br />
 <h2 class="title">{% trans "Comments" %}</h2>
 <div class="greybox">
     {% for comment in comments %}
-    <span style="float:right; font-size:x-small">{{ comment.added|date }}
-        {{ comment.added|time }}</span>
+    <span style="float:right; font-size:x-small">{{ comment.submit_date|date }}
+        {{ comment.submit_date|time }}</span>
     <h4 class="news"><a href="#">{{ comment.user }}</a></h4>
-    <p class="news">{{ comment.message }}</p>
+    <p class="news">{{ comment.comment }}</p>
     <br />
-    <div style="text-align:right">
-    <form action="{% url aur.views.comment object_id=pkg.name %}" method="post">
-            <input type="hidden" name="reply_to" value="{{ comment.id }}" />
-            <input type="submit" value="{% trans "Reply" %}" />
-        </form>
-    </div>
     {% if not forloop.last %}<br />{% endif %}
     {% endfor %}
 </div>
 {% endif %}
-{% endwith %}
 <br />
+{% get_comment_form for pkg as form %}
+{% if user.is_authenticated %}
 <h2 class="title">{% trans "Post comment" %}</h2>
 <div class="greybox" style="text-align:right">
-    <form action="{% url aur.views.comment object_id=pkg.name %}" method="post">
-        <textarea name="message" style="width:100%;" rows="10"></textarea><br />
-        <input type="submit" value="{% trans "Reply" %}" />
-    </form>
+	<form action="{% comment_form_target %}" method="post">
+		{% for field in form.hidden_fields %}{{ field }}{% endfor %}
+		{{ form.comment }}
+		<div>
+			<input type="submit" name="submit" class="submit-post" value="Submit">
+			<input type="reset" name="reset" class="reset-post" value="Reset">
+		</div>
+	</form>
 </div>
+{% endif %}
 {% endblock %}
-
