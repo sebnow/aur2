@@ -68,7 +68,7 @@
                 </div>
             </td><td valign="top">
                 <div class="listing">
-                    <h4>{% trans "Reverse dependencies" %}:</h4>
+                    <h4>{% trans "Required By" %}:</h4>
                     <ul style="font-size:small;list-style:none">
                     {% ifnotequal pkg.reverse_depends.all.count 0 %}
                         {% for dep in pkg.reverse_depends.all %}
