@@ -25,6 +25,9 @@
     </div>
     <table class="listing">
         <tr>
+            <th>{% trans "Architecture" %}:</th>
+            <td>{{ pkg.get_arch }}</td>
+        </tr><tr>
             <th>{% trans "Repository" %}:</th>
             <td>{{ pkg.repository.name }}</td>
         </tr><tr>
@@ -34,9 +37,6 @@
         </tr><tr>
             <th>{% trans "Description" %}:</th>
             <td>{{ pkg.description }}</td>
-        </tr><tr>
-            <th>{% trans "Architecture" %}:</th>
-            <td>{{ pkg.get_arch }}</td>
             </tr>{% if pkg.url %}<tr>
             <th>{% trans "URL" %}:</th>
             <td><a href="{{ pkg.url }}">{{ pkg.url }}</a></td>
