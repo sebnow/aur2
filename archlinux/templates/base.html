@@ -43,7 +43,7 @@
                     {% if user.is_authenticated %}
                     <li><a href="{% url aur.views.submit %}">{% trans "Submit" %}</a></li>
                     {% endif %}
-                    <li><a href="/">{% trans "Packages" %}</a></li>
+					<li><a href="{% url aur.views.search %}">{% trans "Packages" %}</a></li>
                 </ul>
             </div>
             {% endblock %}
