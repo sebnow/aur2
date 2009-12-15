@@ -41,6 +41,9 @@
             <th>{% trans "URL" %}:</th>
             <td><a href="{{ pkg.url }}">{{ pkg.url }}</a></td>
             </tr>{% endif %}<tr>
+            <th>{% trans "License" %}:</th>
+            <td>{{ pkg.get_licenses }}</td>
+		</tr><tr>
             <th>{% trans "Maintainer" %}:</th>
             <td>{{ pkg.maintainers.all|join:", " }}</td>
         </tr><tr>
