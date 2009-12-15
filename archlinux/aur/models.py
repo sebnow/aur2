@@ -105,6 +105,10 @@ class Package(models.Model):
         return ', '.join(map(smart_unicode, self.architectures.all()))
     get_arch.short_description = 'architectures'
 
+    def get_licenses(self):
+        return ', '.join(map(smart_unicode, self.licenses.all()))
+    get_arch.short_description = 'licenses'
+
     def get_tarball_basename(self):
         """Return the basename of the absolute path to the tarball"""
         return os.path.basename(self.tarball.path)
