@@ -1,19 +1,12 @@
-from re import sub
-import os
-import sys
-import tarfile
-import hashlib
-
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
-from django import forms
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.core import serializers
 from django.utils.translation import ugettext
 
-from aur.models import *
+from aur.models import Package, Comment, PackageNotification
 from aur.forms import PackageSearchForm, PackageSubmitForm
 
 # Helper functions for permissions

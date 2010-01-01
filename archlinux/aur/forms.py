@@ -1,11 +1,16 @@
-from django import forms
-from django.core.files import File
-
-from aur.models import *
-import aur.Package as PKGBUILD
-
+import tarfile
+import hashlib
 import os
 import sys
+import tempfile
+
+from django import forms
+from django.db import transaction
+from django.core.files import File
+
+import aur.Package as PKGBUILD
+from aur.models import Architecture, Repository, Package, Provision, \
+    License, PackageFile, PackageHash
 
 class PackageSearchForm(forms.Form):
     # Borrowed from AUR2-BR
@@ -72,8 +77,6 @@ class PackageField(forms.FileField):
         super(PackageField, self).__init__(*args, **kwargs)
 
     def clean(self, data, initial=None):
-        import tempfile
-        import tarfile
         file = super(PackageField, self).clean(data, initial)
 
         errors = list()
@@ -134,8 +137,6 @@ class PackageSubmitForm(forms.Form):
 
     @transaction.commit_manually
     def save(self, user):
-        import hashlib
-        import tarfile
         pkg = self.cleaned_data['package']
         tmpdir = os.path.dirname(pkg['filename'])
         updating = False
