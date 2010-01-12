@@ -24,9 +24,7 @@ urlpatterns = patterns('aur.views',
         'notify_of_updates', name='aur-notify_of_updates'),
     url(r'^package/(?P<object_id>[\w_-]+)/denotify_of_updates/$',
         'denotify_of_updates', name='aur-denotify_of_updates'),
-    (r'^api/search/(?P<query>[\w\d_ -]+).(?P<format>(json|xml))$', 'api_search'),
-    (r'^api/package/(?P<object_id>[\w_-]+).(?P<format>(json|xml))$', 'api_package_info'),
-    (r'^api/package/(?P<object_id>[\w_-]+)/comments.(?P<format>(json|xml))$', 'api_package_comments'),
+    (r'^api/', include('archlinux.aur.api.urls')),
     url(r'^manage_packages/$', 'manage_packages', name='aur-manage_packages'),
 )
 
