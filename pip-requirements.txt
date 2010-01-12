@@ -1,3 +1,4 @@
 Django>=1.0
 django-registration>=0.7
+django-piston>=0.2.2
 -e svn+http://django-tagging.googlecode.com/svn/trunk/#egg=tagging
